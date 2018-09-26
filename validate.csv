@@ -1,0 +1,6 @@
+round,id1,id2,bid1,bid2
+1,1,2,defect,cooperate
+2,1,2,cooperate,defect
+3,1,2,defect,defect
+4,1,2,cooperate,cooperate
+5,2,1,cooperate,defect
