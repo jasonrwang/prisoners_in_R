@@ -56,5 +56,38 @@ axelrod_code = function(bid1, bid2) {
     }
 }
 
+axelrod_encode = function(a_code) {
+    num_agents = nrow(a_code) # Determine number of agents, n, in 'n x n' matrix input
+    code_id = decision = win = c()
+
+    for (i in seq(num_agents)) { # The "attacking" agent
+        for (j in seq(num_agents)) { # The "defending" agent
+            # Agents cannot play themselves, so skip in this case.
+            if (i == j) { # This could be improved by stripping i_id1 from i_id2's for loop declaration
+                next
+            }
+
+            for (k in seq(length(a[i,j,])-3)) {
+
+                encoded_seq = (a[i,j,k] * 4^2 + a[i,j,k+1] * 4^1 + a[i,j,k+2] * 4^0)
+                code_id = c(code_id,encoded_seq)
+
+                if (a[i,j,k+3] > 1) { # 0 and 1 are defect; 2 and 3
+                    decision = c(decision,'C')
+                } else {
+                    decision = c(decision,'D')
+                }
+
+                if (a[i,j,k+3] %% 2) { # Consider R and T (1 and 3) as win
+                    win = c(win,TRUE)
+                } else {
+                    win = c(win,FALSE)
+                }
+            }
+        }
+    }
+    return(data.frame(code_id,decision,win, stringsAsFactors = FALSE))
+}
+
 ## For testing
 # raw_parser("validate.csv")
