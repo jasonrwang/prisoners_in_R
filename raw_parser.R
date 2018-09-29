@@ -1,6 +1,6 @@
 raw_parser = function(file_name) {
 
-    tourn_raw = read.csv("validate.csv",sep=",",stringsAsFactors = FALSE)
+    tourn_raw = read.csv(file_name,sep=",",stringsAsFactors = FALSE)
     num_agents = max(unique(tourn_raw$id1)) # Only works if IDs are sequential!
     outcome_sequences = array(data=NA,dim=c(num_agents,num_agents,40)) # 40 is wasteful. See improvement suggestion below.
     # typeof(outcome_sequences) ## just for testing
@@ -13,7 +13,7 @@ raw_parser = function(file_name) {
 
         for (i_id2 in seq(num_agents)) { # The "defending" agent
             # Agents cannot play themselves, so skip in this case.
-            if (i_id1 == i_id2) {
+            if (i_id1 == i_id2) { # This could be improved by stripping i_id1 from i_id2's for loop declaration
                 next
             }
 
@@ -39,16 +39,16 @@ raw_parser = function(file_name) {
 axelrod_code = function(bid1, bid2) {
     # Determines the letter code associated with an interaction
     if (bid1 == 'cooperate') {
-       if (bid1 == bid2) { # CC -> R
-            return('R')
-       } else { # CD -> S
-            return('S')
+       if (bid1 == bid2) { # CC -> R -> 3
+            return(3)
+       } else { # CD -> S -> 2
+            return(2)
        }
     }  else if (bid1 == 'defect') {
-        if (bid1 == bid2) { # DD -> P
-            return('P')
-        } else { # DC -> T
-            return('T')
+        if (bid1 == bid2) { # DD -> P -> 0
+            return(0)
+        } else { # DC -> T -> 1
+            return(1)
         }
     } else {
        print("Error in cooperate-defect matching!")
