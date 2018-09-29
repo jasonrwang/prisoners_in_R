@@ -1,6 +1,6 @@
 # prisoners_in_R
 
-This project is for an algorithm to play in the EPA1315 Prisoner's Dilemma tournament.
+This project is for an algorithm to play in the TU Delft EPA1315 Prisoner's Dilemma tournament.
 
 ### Functionality
 1. Uses an elementary genetic algorithm (based on Axelrod's method [1]) to learn the best ways to react to another agent based on their previous choices
