@@ -1,0 +1,189 @@
+---
+title: "Coding Tournament"
+author: "Yugdeep"
+date: "24 September 2017"
+output: html_document
+---
+
+```{r setup, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#setwd("C:/Users/yugde/OneDrive/EPA/EPA1315/Tournament") #Change this directory to where your files are stored
+myScriptName <- "myDefector.R"
+numberOfrounds <- sample(700:1000, 1) #Value for number of rounds is randomly picked in the range of 700:1000
+x = c("cooperate","cooperate","defect","defect")
+y = c("cooperate","defect","cooperate","defect")
+z = c(4,0,5,2)
+w = c(4,5,0,2)
+book <- data.frame("id1"=integer(),"id2"=integer(),"tradeno"=integer(),"bid1"=character(),"bid2"=character(), "payoff1"=integer(), "payoff2"=integer())
+df <- data.frame("bid1"=x,"bid2"=y, payoff1 = z, payoff2 = w)
+```
+
+
+
+## Serialize the agents
+
+
+```{r serializeAgents, echo = FALSE}
+fileNames <- list.files()
+scriptNames <- fileNames[grep(pattern = "\\.R$", x = fileNames)]
+scriptNames <- scriptNames[-grep(pattern = myScriptName, x = scriptNames)]
+agent_list <- list()
+playing_script_names <- c()
+for(i in 1:length(scriptNames)) {
+  agentCode <- dget(scriptNames[i])
+  agent_list[[i]] <- agentCode$new()
+  playing_script_names[i] <- scriptNames[i]
+}
+
+# Test agents for functionality
+# Remove non-functional agents
+
+numberOfStudentAgents <- length(agent_list)
+numberOfMyAgents <- (numberOfStudentAgents %% 2) + 2
+for (i in (numberOfStudentAgents+1):(numberOfStudentAgents+numberOfMyAgents)) {
+  myAgentCode <- dget(myScriptName)
+  agent_list[[i]] <- myAgentCode$new()
+  playing_script_names[i] <- myScriptName
+}
+numberOfTotalAgents <- length(agent_list)
+agent_ids <- sample(seq(from = 1, to = numberOfTotalAgents, by = 1))
+agent_list <- agent_list[agent_ids]
+playing_script_names <- playing_script_names[agent_ids]
+for(i in 1:numberOfTotalAgents) {
+  cat(playing_script_names[i], "has the ID of", i, "\n")
+}
+agents_info <- data.frame("agent_id"=c(1:numberOfTotalAgents), "agent_file_name"=playing_script_names, "net_payoff"=NA)
+```
+
+
+
+## Create the contest
+
+
+```{r createTournament, echo=FALSE}
+# matches are paired opportunities for agents to compete
+matches <- c()
+for (i in 1:numberOfrounds) {
+  
+  # There will be an even number of agents, up to about 40
+  # each agent has a unique id
+  id_list<-1:numberOfTotalAgents
+  
+  # shuffle the list in place
+  shuffle <- sample(id_list)
+  
+  while (length(shuffle) > 0) {
+    
+    # get two agents off the list
+    el1 <- shuffle[[1]]
+    el2 <- shuffle[[2]]
+    
+    # remove two agents off the front of the list
+    shuffle <- shuffle[-1]
+    shuffle <- shuffle[-1]
+    
+    # add your contest to the end of the match list
+    matches[[length(matches)+1]] <- c(el1,el2)
+    
+  }
+}
+```
+
+`r numberOfTotalAgents` agents are participating in this tournament which will consist of `r numberOfrounds` rounds.
+
+## Run the tournament
+
+
+Tournament started...
+
+```{r runTournament, echo=FALSE}
+# Run the Tournament
+# Create the payoff table
+
+x <- length(matches)
+# matches is a list of list
+# The outer list is a list of contests
+# The inner list is a list of two agents
+
+for (i in 1:x) {
+  
+  # find the first contest
+  # get the list, not the slice
+  contest <- matches[[i]]
+  
+  # get the ideas
+  id1 <- contest[[1]]
+  id2 <- contest[[2]]
+  
+  # get the agents
+  agent1 = agent_list[[id1]]
+  agent2 = agent_list[[id2]]
+  
+  # set the agent ids
+  agent1$set_id(id1)
+  agent2$set_id(id2)
+  
+  # set the opponent number
+  agent1$set_opponent_id(id2)
+  agent2$set_opponent_id(id1)
+  
+  # set the greetings
+  agent1$set_greeting()
+  agent2$set_greeting()
+  
+  # get the greetings
+  greeting1 <- agent1$greeting
+  greeting2 <- agent2$greeting
+  
+  #send the greetings
+  agent1$receive_greeting(greeting2)
+  agent2$receive_greeting(greeting1)
+  
+  # set the round number
+  agent1$set_round(i)
+  agent2$set_round(i)
+  
+  # pass the tournament book
+  agent1$set_book(book)
+  agent2$set_book(book)
+  
+  # get the bids
+  agent1$get_bid()
+  agent2$get_bid()
+  
+  mybid1 <- agent1$bid
+  mybid2 <- agent2$bid
+  
+  # Run the Tournament
+  # record the transaction
+  payoffs <-subset(df, bid1 == mybid1 & bid2 == mybid2)
+  payoff1 <- payoffs$payoff1
+  payoff2 <- payoffs$payoff2
+  book = rbind(book,data.frame("id1"=id1,"id2"=id2,"tradeno"= i,"bid1"=mybid1,"bid2"=mybid2,"payoff1"=payoff1,"payoff2"=payoff2))
+}
+```
+
+## Report results
+
+```{r reportResults, echo=FALSE}
+total_payoff <- 0
+for(i in 1:numberOfTotalAgents) {
+  payoff <- sum((subset(book, i==id1))[["payoff1"]])+sum((subset(book, i==id2))[["payoff2"]])
+  cat("Payoff for Agent", i, "(",playing_script_names[i],") is", payoff, "\n")
+  total_payoff <- total_payoff + payoff
+  agents_info[i,"net_payoff"] <- payoff
+}
+write.csv2(book,file="bid_register.csv")
+write.csv2(agents_info,file="agents_info.csv")
+```
+
+Tournament over.
+
+
+Tournament history has been exported to `bid_register.csv` and `agents_info.csv` files in the current directory.
+
+### Rankings are as follow:
+
+```{r rankings, echo=FALSE}
+agents_info[with(agents_info, order(-net_payoff)), ]
+```
