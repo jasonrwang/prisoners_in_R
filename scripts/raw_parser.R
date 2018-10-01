@@ -1,6 +1,6 @@
 raw_parser = function(file_name) {
 
-    tourn_raw = read.csv("validate.csv",sep=",",stringsAsFactors = FALSE)
+    tourn_raw = read.csv(file_name,sep=",",stringsAsFactors = FALSE)
     num_agents = max(unique(tourn_raw$id1)) # Only works if IDs are sequential!
     outcome_sequences = array(data=NA,dim=c(num_agents,num_agents,40)) # 40 is wasteful. See improvement suggestion below.
     # typeof(outcome_sequences) ## just for testing
@@ -13,7 +13,7 @@ raw_parser = function(file_name) {
 
         for (i_id2 in seq(num_agents)) { # The "defending" agent
             # Agents cannot play themselves, so skip in this case.
-            if (i_id1 == i_id2) {
+            if (i_id1 == i_id2) { # This could be improved by stripping i_id1 from i_id2's for loop declaration
                 next
             }
 
@@ -39,21 +39,54 @@ raw_parser = function(file_name) {
 axelrod_code = function(bid1, bid2) {
     # Determines the letter code associated with an interaction
     if (bid1 == 'cooperate') {
-       if (bid1 == bid2) { # CC -> R
-            return('R')
-       } else { # CD -> S
-            return('S')
+       if (bid1 == bid2) { # CC -> R -> 3
+            return(3)
+       } else { # CD -> S -> 2
+            return(2)
        }
     }  else if (bid1 == 'defect') {
-        if (bid1 == bid2) { # DD -> P
-            return('P')
-        } else { # DC -> T
-            return('T')
+        if (bid1 == bid2) { # DD -> P -> 0
+            return(0)
+        } else { # DC -> T -> 1
+            return(1)
         }
     } else {
        print("Error in cooperate-defect matching!")
        break
     }
+}
+
+axelrod_encode = function(a_code) {
+    num_agents = nrow(a_code) # Determine number of agents, n, in 'n x n' matrix input
+    code_id = decision = win = c()
+
+    for (i in seq(num_agents)) { # The "attacking" agent
+        for (j in seq(num_agents)) { # The "defending" agent
+            # Agents cannot play themselves, so skip in this case.
+            if (i == j) { # This could be improved by stripping i_id1 from i_id2's for loop declaration
+                next
+            }
+
+            for (k in seq(length(a[i,j,])-3)) {
+
+                encoded_seq = (a[i,j,k] * 4^2 + a[i,j,k+1] * 4^1 + a[i,j,k+2] * 4^0)
+                code_id = c(code_id,encoded_seq)
+
+                if (a[i,j,k+3] > 1) { # 0 and 1 are defect; 2 and 3
+                    decision = c(decision,'C')
+                } else {
+                    decision = c(decision,'D')
+                }
+
+                if (a[i,j,k+3] %% 2) { # Consider R and T (1 and 3) as win
+                    win = c(win,TRUE)
+                } else {
+                    win = c(win,FALSE)
+                }
+            }
+        }
+    }
+    return(data.frame(code_id,decision,win, stringsAsFactors = FALSE))
 }
 
 ## For testing
