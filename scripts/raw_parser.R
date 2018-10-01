@@ -67,18 +67,22 @@ axelrod_encode = function(a_code) {
                 next
             }
 
-            for (k in seq(length(a[i,j,])-3)) {
+            for (k in seq(length(a_code[i,j,])-3)) {
 
-                encoded_seq = (a[i,j,k] * 4^2 + a[i,j,k+1] * 4^1 + a[i,j,k+2] * 4^0)
+                if (is.na(a_code[i,j,k+3])) { ## Due to dumb coding above, NA exists in list
+                    next
+                }
+
+                encoded_seq = (a_code[i,j,k] * 4^2 + a_code[i,j,k+1] * 4^1 + a_code[i,j,k+2] * 4^0)
                 code_id = c(code_id,encoded_seq)
 
-                if (a[i,j,k+3] > 1) { # 0 and 1 are defect; 2 and 3
+                if (a_code[i,j,k+3] > 1) { # 0 and 1 are defect; 2 and 3
                     decision = c(decision,'C')
                 } else {
                     decision = c(decision,'D')
                 }
 
-                if (a[i,j,k+3] %% 2) { # Consider R and T (1 and 3) as win
+                if (a_code[i,j,k+3] %% 2) { # Consider R and T (1 and 3) as win
                     win = c(win,TRUE)
                 } else {
                     win = c(win,FALSE)
