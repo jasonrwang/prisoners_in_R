@@ -10,6 +10,6 @@ This agent does not evolve during a game – it must be trained beforehand on s
 
 ## Acknowledgements
 
-This project was made by Siemon Keij, Phillip Seijger, Mees, and Jason R Wang.
+This project was made by Siemon Keij, Phillip Seijger, Mees Hoff, and Jason R Wang.
 
 [1] S. Mittal and K. Deb, “Optimal Strategies of the Iterated Prisoner’s Dilemma Problem for Multiple Conflicting Objectives,” IEEE Trans. Evol. Comput., vol. 13, no. 3, pp. 554–565, Jun. 2009.
