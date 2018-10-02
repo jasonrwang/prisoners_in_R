@@ -38,11 +38,10 @@ Cooperates on the first move, then simply copies the opponent’s last move. In 
 Same as Tit for Tat, except that it defects on the first move.
 
 #### 5. Pavlov
-Cooperates on the first move, and defects only if both the players did not agree on the previous move.
+Cooperates on the first move, and defects only if both the players did not agree on the previous move. 
 
 #### 6. Spiteful
-Cooperates, until the opponent defects, and
-thereafter always defects.
+Cooperates, until the opponent defects, and thereafter always defects. Can work out positively in terms of own interest, but may also be risky if first opponent defect occurs early.
 
 #### 7. Random Player
 Makes a random move.
