@@ -22,14 +22,17 @@ raw_parser = function(file_name) {
             ## The below can be an improvement, but doesn't quite work yet.
             ## The "list" cannot replace the single element.
             # The number of times i_id1 attacks i_id2 to help pre-allocate list
-            seq_list_len = length(which(id1_index %in% id2_index))
+            match_id = which(id1_index %in% id2_index)
+            seq_list_len = length(match_id)
             #outcome_sequences[i_id1,i_id2] = vector("list",seq_list_len) # pre-allocate
 
             # To get data about the number of games played between each pair
             #seq_length_list = c(seq_length_list,seq_list_len)
 
             for (i in seq(seq_list_len)){
-                outcome_sequences[i_id1,i_id2,i] = axelrod_code(tourn_raw$bid1[id1_index[i]],tourn_raw$bid2[id1_index[i]])
+                outcome_sequences[i_id1,i_id2,i] = axelrod_code(
+                    tourn_raw$bid1[ id1_index [ match_id[i] ] ],
+                    tourn_raw$bid2[ id1_index [ match_id[i] ] ])
             }
         }
     }
@@ -38,17 +41,20 @@ raw_parser = function(file_name) {
 
 axelrod_code = function(bid1, bid2) {
     # Determines the letter code associated with an interaction
-    if (bid1 == 'cooperate') {
+    if (is.na(bid1)) {
+        next
+    }
+    else if (bid1 == 'cooperate') {
        if (bid1 == bid2) { # CC -> R -> 3
-            return(3)
+            return("R")
        } else { # CD -> S -> 2
-            return(2)
+            return("S")
        }
     }  else if (bid1 == 'defect') {
         if (bid1 == bid2) { # DD -> P -> 0
-            return(0)
+            return("P")
         } else { # DC -> T -> 1
-            return(1)
+            return("T")
         }
     } else {
        print("Error in cooperate-defect matching!")
