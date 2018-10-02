@@ -77,7 +77,7 @@ Like Naive Prober, but it tries to break the series of mutual defections after d
 
 ## Selected Strategie
 
-### Axelrod single- objective evolutionary algorithm
+### Axelrod Single- Objective Evolutionary Algorithm
 
 The concept of our agent is based on the fact that for each move in the game there are four possibilities. Both players can cooperate (CC or R for reward), the first player cooperats and the other player defects (CD or S for sucker), the first player can defect and the second cooperates (DC or T for temptation), or both players defect (DD or P for penalty). For our strategie we consider the last three moves as a three letter code. For instance, the situation is which the last three rounds both agents cooperated, has a three letter sequence RRR.
 
@@ -86,6 +86,8 @@ This combination of letters is used to generate a number 0:63. This is done by s
 An Exception is made for the so called "lemon agents", these agents are introducing themselves by saying "lemon" and will always cheat. For this reason, in a situation of an opponent that introduces itself by "lemon" the defect option is always selected.
 
 ## Creating the 64 bit string
+
+(in some subcatogories)....
 
 
 This is our code.
