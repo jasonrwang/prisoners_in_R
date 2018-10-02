@@ -46,15 +46,15 @@ axelrod_code = function(bid1, bid2) {
     }
     else if (bid1 == 'cooperate') {
        if (bid1 == bid2) { # CC -> R -> 3
-            return("R")
+            return(3)
        } else { # CD -> S -> 2
-            return("S")
+            return(2)
        }
     }  else if (bid1 == 'defect') {
         if (bid1 == bid2) { # DD -> P -> 0
-            return("P")
+            return(0)
         } else { # DC -> T -> 1
-            return("T")
+            return(1)
         }
     } else {
        print("Error in cooperate-defect matching!")
