@@ -11,7 +11,7 @@ In the agent-based tournament coding challenged each agent has to face an intera
 
 
 
-Payoff | cooperate | Defect
+Payoff | Cooperate | Defect
 --- | --- | ---
 Cooperate| 4/4 | 0/5
 Defect | 5/0 | 2/2
@@ -44,7 +44,7 @@ Cooperates on the first move, and defects only if both the players did not agree
 Cooperates, until the opponent defects, and thereafter always defects. Can work out positively in terms of own interest, but may also be risky if first opponent defect occurs early.
 
 #### 7. Random Player
-Makes a random move.
+Makes a random move each turn again.
 
 #### 8. Periodic player CD:
 Plays C, D periodically.
@@ -56,7 +56,7 @@ Plays D, D, C periodically.
 Plays C, C, D periodically.
 
 #### 11. Tit for Two Tats
-Cooperates on the first move, and defects only when the opponent defects two times.
+Cooperates on the first move, and defects only when the opponent defects two times. Compared to the regular tit for tat, this strategy is more socially oriented.
 
 #### 12. Soft Majority
 Begins by cooperating, and cooperates as long as the number of times the opponent has cooperated is greater than or equal to the number of times it has defected, else it defects.
@@ -68,7 +68,7 @@ Defects on the first move, and defects if the number of defections of the oppone
 Cooperates on the first move, and defects if the opponent has defects on any of the previous three moves, else cooperates.
 
 #### 15. NaiveProber
-Like TitforTat,but occasionally defects.
+Like TitforTat,but occasionally, randomly defects.
 
 #### 16. Remorseful Prober :
 Like Naive Prober, but it tries to break the series of mutual defections after defecting.
