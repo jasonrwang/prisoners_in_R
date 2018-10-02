@@ -3,8 +3,43 @@ title: "Coding Challenge"
 output: html_document
 ---
 
+# Agent-Based Tournament Coding Challenge (TU Delft - EPA1315 Data Analysis and Visualization)
+
 ## Introduction
-THis is our code.
+
+In the agent-based tournament coding challenged each agent has to face an interated prisoner's dilemma. The prisoners dilemma is extensively studied in multiple scientific areas, such as economics, machine learning and evolutionary biology [1]. The core concept of the game is that each of the two competitors can choose 1 of 2 option for each round. These options are to either defect or cooperate. Both player simultaneously and independently select an option and depending on both options a payoff for each player is determined.
+
+
+
+Payoff | cooperate | Defect
+--- | --- | ---
+Cooperate| 4/4 | 0/5
+Defect | 5/0 | 2/2
+
+
+
+
+
+
+
+
+## Common Strategies
+
+
+## Selected Strategie
+
+The concept of our agent is based on the fact that for each move in the game there are four possibilities. Both players can cooperate (CC or R for reward), the first player cooperats and the other player defects (CD or S for sucker), the first player can defect and the second cooperates (DC or T for temptation), or both players defect (DD or P for penalty). For our strategie we consider the last three moves as a three letter code. For instance, the situation is which the last three rounds both agents cooperated, has a three letter sequence RRR.
+
+This combination of letters is used to generate a number 0:63. This is done by setting R=0, T=1, S=2 and P=3 and interpret it as a number on base 4. SSP for instance is 43 is this way. Each of the numbers 0:63 either stands for defect or cooperate, therefore based on the last 3 moves a option is selected. Since this decision is based upon the last the 3 moves, the first three moves cannot be defined by this strategy. For this reason these are defected.
+
+An Exception is made for the so called "lemon agents", these agents are introducing themselves by saying "lemon" and will always cheat. For this reason, in a situation of an opponent that introduces itself by "lemon" the defect option is always selected.
+
+## Creating the 64 bit string
+
+
+
+ 
+This is our code.
 
 Our code runs from `main.R` and calls modularized functions in the `/scripts/` folder.
 
@@ -28,3 +63,5 @@ a = 123
 
 
 ```
+
+[1] S. Mittal and K. Deb, “Optimal Strategies of the Iterated Prisoner’s Dilemma Problem for Multiple Conflicting Objectives,” IEEE Trans. Evol. Comput., vol. 13, no. 3, pp. 554–565, Jun. 2009.
