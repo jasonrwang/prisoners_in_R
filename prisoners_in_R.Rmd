@@ -23,57 +23,58 @@ Defect | 5/0 | 2/2
 
 
 
-## Common Strategies (Note: for now the strategies are just copy pasted and text should be still adjusted)
+## Common Strategies 
 
-### 1. Always Cooperate
-Cooperates on every move 2) 
+#### 1. Always Cooperate
+Cooperates on every move, as a strategie this can be considered very social but not most benefial for own interest
 
-### 2. Always Defect
-Defects on every move
+#### 2. Always Defect
+Defects on every move, this is considered a 'hard' strategy'.
 
-### 3. Tit for Tat
-Cooperates on the first move, then simply copies the opponent’s last move.
+#### 3. Tit for Tat
+Cooperates on the first move, then simply copies the opponent’s last move. In experimental tournaments this strategy turned out surprisingly successful.
 
-### 4. Suspicious Tit for Tat
-Same as Tit for Tat, except that it defects on the first move
+#### 4. Suspicious Tit for Tat
+Same as Tit for Tat, except that it defects on the first move.
 
-### 5. Pavlov
+#### 5. Pavlov
 Cooperates on the first move, and defects only if both the players did not agree on the previous move.
 
-### 6. Spiteful
+#### 6. Spiteful
 Cooperates, until the opponent defects, and
 thereafter always defects.
 
-### 7. Random Player
+#### 7. Random Player
 Makes a random move.
 
-### 8. Periodic player CD:
+#### 8. Periodic player CD:
 Plays C, D periodically.
 
-### 9. Periodic player DDC
+#### 9. Periodic player DDC
 Plays D, D, C periodically.
 
-### 10. Periodic player CCD
+#### 10. Periodic player CCD
 Plays C, C, D periodically.
 
-### 11. Tit for Two Tats
+#### 11. Tit for Two Tats
 Cooperates on the first move, and defects only when the opponent defects two times.
 
-### 12. Soft Majority
+#### 12. Soft Majority
 Begins by cooperating, and cooperates as long as the number of times the opponent has cooperated is greater than or equal to the number of times it has defected, else it defects.
 
-### 13, Hard Majority
+#### 13, Hard Majority
 Defects on the first move, and defects if the number of defections of the opponent is greater than or equal to the number of times it has cooperated, else cooperates.
 
-### 14. Hard Tit for Tat
+#### 14. Hard Tit for Tat
 Cooperates on the first move, and defects if the opponent has defects on any of the previous three moves, else cooperates.
 
-### 15. NaiveProber
+#### 15. NaiveProber
 Like TitforTat,but occasionally defects.
 
-### 16. Remorseful Prober :
+#### 16. Remorseful Prober :
 Like Naive Prober, but it tries to break the series of mutual defections after defecting.
 
+[1]
 
 ## Selected Strategie
 
