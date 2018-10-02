@@ -131,10 +131,10 @@ Agent <- R6Class("Agent",
                              last_move_opponent <- NA
                              last_round <- tail(subset(self$book, (id1 == self$id | id2 == self$id) & (id1 == self$opponent_id | id2 == self$opponent_id)), 3)
 
-                             check_greeting()
-                             check_moves()
-                             tit_for_tat()
-                             string_three_plus()
+                             self$check_greeting()
+                             self$check_moves()
+                             self$tit_for_tat()
+                             self$string_three_plus()
                            },
 
                            formulate_bid = function() {
