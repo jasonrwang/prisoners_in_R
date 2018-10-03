@@ -1,0 +1,13 @@
+"";"agent_id";"agent_file_name";"net_payoff"
+"1";1;"myDefector.R";0
+"2";2;"ag_cooperator.R";21308
+"3";3;"ag_tft2.R";25913
+"4";4;"myDefector.R";23666
+"5";5;"ag_pavlof2.R";27854
+"6";6;"ag_intermediate.R";20252
+"7";7;"ag_AXELROD.R";28401
+"8";8;"ag_BRUTE.R";19601
+"9";9;"ag_random2.R";16222
+"10";10;"myDefector.R";23849
+"11";11;"ag_EXTORT3.R";28445
+"12";12;"ag_random.R";16320
