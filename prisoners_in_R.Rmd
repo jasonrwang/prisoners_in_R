@@ -273,7 +273,12 @@ extract_statistics <- function( file_name) {
 
 ```
 
-The string that is created by this code is: DDDDDDCCCDCDDDDDDCDDDDCDCCDDCDDDDCDCCCDDCDCDCDCDDCCDDDDCDDDDDCCCDCCDD. This will be used inside the agent code. That code will follow now.
+The string that was created from these scripts is CCCDCCCDCCCDCCCDCDCDCDDDCDDDDDDDCCCDCDDDCDDDDDDDDDDDCDCDCDDDDDDD. The agent will calculate the number that is in accordance with the last three meetings, this is the index for which number to take from the string.
+
+
+#string for now: "C","C","C","D","C","C","C","D","C","C","C","D","C","C","C","D","C","D","C","D","C","D","D","D","C","D","D","D","D","D","D","D","C","C","C","D","C","D","D","D","C","D","D","D","D","D","D","D","D","D","D","D","C","D","C","D","C","D","D","D","D","D","D","D"
+
+#string from pdf: "D","D","D","D","D","D","C","C","C","D","D","C","D","D","D","D","D","D","C","D","D","D","D","C","D","C","C","D","D","C","D","D","D","D","C","D","C","C","C","D","D","C","D","C","D","C","D","C","D","D","C","C","D","D","D","D","C","D","D","D","D","D","C","C"
 
 ```{R}
 library(R6)
