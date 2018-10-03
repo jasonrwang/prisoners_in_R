@@ -1,8 +1,8 @@
 raw_parser = function(file_name) {
 
-    tourn_raw = read.csv(file_name,sep=",",stringsAsFactors = FALSE)
+    tourn_raw = read.csv(file_name,sep=";",stringsAsFactors = FALSE)
     num_agents = max(unique(tourn_raw$id1)) # Only works if IDs are sequential!
-    outcome_sequences = array(data=NA,dim=c(num_agents,num_agents,40)) # 40 is wasteful. See improvement suggestion below.
+    outcome_sequences = array(data=NA,dim=c(num_agents,num_agents,1000)) # 40 is wasteful. See improvement suggestion below.
     # typeof(outcome_sequences) ## just for testing
 
     ## To get data about the number of games played between each pair
@@ -46,15 +46,15 @@ axelrod_code = function(bid1, bid2) {
     }
     else if (bid1 == 'cooperate') {
        if (bid1 == bid2) { # CC -> R -> 3
-            return("R")
+            return(3)
        } else { # CD -> S -> 2
-            return("S")
+            return(2)
        }
     }  else if (bid1 == 'defect') {
         if (bid1 == bid2) { # DD -> P -> 0
-            return("P")
+            return(0)
         } else { # DC -> T -> 1
-            return("T")
+            return(1)
         }
     } else {
        print("Error in cooperate-defect matching!")
