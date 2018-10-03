@@ -12,3 +12,5 @@ View(axelrod_string)
 print(axelrod_string)
 
 #string for now: "C","C","C","D","C","C","C","D","C","C","C","D","C","C","C","D","C","D","C","D","C","D","D","D","C","D","D","D","D","D","D","D","C","C","C","D","C","D","D","D","C","D","D","D","D","D","D","D","D","D","D","D","C","D","C","D","C","D","D","D","D","D","D","D"
+
+#string from pdf: "D","D","D","D","D","D","C","C","C","D","D","C","D","D","D","D","D","D","C","D","D","D","D","C","D","C","C","D","D","C","D","D","D","D","C","D","C","C","C","D","D","C","D","C","D","C","D","C","D","D","C","C","D","D","D","D","C","D","D","D","D","D","C","C"
