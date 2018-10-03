@@ -1,5 +1,5 @@
 ---
-title: "Coding Challenge"
+title: "Agent-Based Tournament Coding Challenge"
 output: html_document
 ---
 
@@ -11,11 +11,10 @@ In the agent-based tournament coding challenged each agent has to face an intera
 
 
 
-Payoff | Cooperate | Defect
+Payoff | Cooperate | Defect         
 --- | --- | ---
 Cooperate| 4/4 | 0/5
 Defect | 5/0 | 2/2
-
 
 
 
