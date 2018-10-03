@@ -414,7 +414,7 @@ We started off on our process by reading the paper by Mittal and Deb. From this 
 
 Furthermore, we also have a part of the code which checks what the greeting is of the agent. This is because of the greeting for the all defect agents, they say "Lemon!.". Unfortunately this part of the code wasn't working to during our testing fase. therefore we were forced to exclude this from our delivered code.
 
-Our first agent had different functions which were called by the get_bid function, but the provided tournament code didn't work with this agent. Therefore we were forced to put all the functions in one large function. With further testing we discovered that other parts of the code that worked sepparatly, didn't work with the provided tournament code. This let us to change our code even more.
+Our first agent had different functions which were called by the get_bid function, but the provided tournament code did not work with this agent. Therefore we were forced to put all the functions in one large function. With further testing we discovered that other parts of the code that worked separately, didn't work with the provided tournament code. This let us to change our code even more.
 
 
 [1] S. Mittal and K. Deb, “Optimal Strategies of the Iterated Prisoner’s Dilemma Problem for Multiple Conflicting Objectives,” IEEE Trans. Evol. Comput., vol. 13, no. 3, pp. 554–565, Jun. 2009.
