@@ -86,43 +86,41 @@ This combination of letters is used to generate a number 0:63. This is done by s
 An Exception is made for the so called "lemon agents", these agents are introducing themselves by saying "Lemon!." and will always cheat. For this reason, in a situation of an opponent that introduces itself by "Lemon!." the defect option is always selected.
 
 
-Main.R looks as follows
+The 'main.R' code is used to call two different scripts; 'raw_parser.R' en 'extract_statistics.R'. These scripts rework the data from last years tournament into a 64-bit string which can be used in the agent.
+
 ```{R}
 ### Main File to run things in!
-#setwd(Set working directory if not yet specified)
 source('scripts/raw_parser.R', chdir = TRUE)
 source('scripts/extract_statistics.R', chdir = TRUE)
 
 ## Run parser to create string
-data_frame = axelrod_encode(raw_parser('data/tournament.csv'))
+data_frame = axelrod_encode(raw_parser('Example_Tournament/bid_register.csv'))
 
 ## Run parsed array through statistics
 axelrod_string = extract_statistics(data_frame)
-View(axelrod_string)
+
+# The string above can be put into the agent manually now
+
 ```
 
-raw_parser.R looks as follows
+The script in 'raw_parser.R' will look at the information from a file in which the bids were registered. For every possible pair of agents, the code will save the different meetings. For every pair the script will look at three meetings and save which combination this is. For every gained combination, the script will look into if the agent won or lost in the fourth meeting. It also knows what both agents bid, this can be used to state which agent won.
+
 ```{R}
 raw_parser = function(file_name) {
 
-    tourn_raw = read.csv(file_name,sep=",",stringsAsFactors = FALSE)
+    tourn_raw = read.csv(file_name,sep=";",stringsAsFactors = FALSE)
     num_agents = max(unique(tourn_raw$id1)) # Only works if IDs are sequential!
-    outcome_sequences = array(data=NA,dim=c(num_agents,num_agents,40)) # 40 is wasteful. See improvement suggestion below.
+    outcome_sequences = array(data=NA,dim=c(num_agents,num_agents,10000)) # 60 is wasteful. See improvement suggestion below.
     # typeof(outcome_sequences) ## just for testing
 
     ## To get data about the number of games played between each pair
     # seq_length_list = c()
 
-    for (i_id1 in seq(num_agents)) { # The "attacking" agent
-        id1_index = which(tourn_raw$id1 %in% i_id1) # Find where agent #i_id1 plays
+    for (i_id1 in seq(num_agents-1)) { # Iterate through all the agents
+        id1_index = which(tourn_raw$id1 %in% i_id1 | tourn_raw$id2 %in% i_id1) # Find where agent plays
 
-        for (i_id2 in seq(num_agents)) { # The "defending" agent
-            # Agents cannot play themselves, so skip in this case.
-            if (i_id1 == i_id2) { # This could be improved by stripping i_id1 from i_id2's for loop declaration
-                next
-            }
-
-            id2_index = which(tourn_raw$id2 %in% i_id2) # Find where agent #i_id2 plays
+        for (i_id2 in seq(i_id1+1,num_agents)) { # Iterate through remaining combinations
+            id2_index = which(tourn_raw$id1 %in% i_id2 | tourn_raw$id2 %in% i_id2) # Find where agent #i_id2 plays
 
             ## The below can be an improvement, but doesn't quite work yet.
             ## The "list" cannot replace the single element.
@@ -151,15 +149,15 @@ axelrod_code = function(bid1, bid2) {
     }
     else if (bid1 == 'cooperate') {
        if (bid1 == bid2) { # CC -> R -> 3
-            return("R")
+            return(3)
        } else { # CD -> S -> 2
-            return("S")
+            return(2)
        }
     }  else if (bid1 == 'defect') {
         if (bid1 == bid2) { # DD -> P -> 0
-            return("P")
+            return(0)
         } else { # DC -> T -> 1
-            return("T")
+            return(1)
         }
     } else {
        print("Error in cooperate-defect matching!")
@@ -168,6 +166,8 @@ axelrod_code = function(bid1, bid2) {
 }
 
 axelrod_encode = function(a_code) {
+    # Takes a vector of behaviour and turns it into a useful data frame for data analysis
+
     num_agents = nrow(a_code) # Determine number of agents, n, in 'n x n' matrix input
     code_id = decision = win = c()
 
@@ -184,7 +184,7 @@ axelrod_encode = function(a_code) {
                     next
                 }
 
-                encoded_seq = (a_code[i,j,k] * 4*4 + a_code[i,j,k+1] * 4 + a_code[i,j,k+2] * 1)
+                encoded_seq = (a_code[i,j,k] * 4^2 + a_code[i,j,k+1] * 4^1 + a_code[i,j,k+2] * 4^0)
                 code_id = c(code_id,encoded_seq)
 
                 if (a_code[i,j,k+3] > 1) { # 0 and 1 are defect; 2 and 3
@@ -201,211 +201,213 @@ axelrod_encode = function(a_code) {
             }
         }
     }
-    return(data.frame(code_id,decision,win, stringsAsFactors = FALSE))
+    return(data.frame(code_id,decision,win,stringsAsFactors = FALSE))
 }
 
-## For testing
-# raw_parser("validate.csv")
 ```
 
 
-extract_statistics.R looks as follows
-```{R}
-get_per <- function(something, file_name,number) {
-    #d <- read.csv(file_name,header=TRUE,sep=",")
-    d=file_name
-    #count the numbers of times the pair made the same decision
-    ccnt=0
-    for (i in d$decision[d$code_id == number]) {
-        if (i == something) {
-            ccnt= ccnt+1
-        }
-    }
-    #print(ccnt)
+The next script, 'extract_statistics.R' works further were 'raw_parser.R' stopped. It will look into the percentage of winnings after every combination for all the different pairs. This can be used to make a decision on what to do after every combination when encoutering an agent. To finalize a string is produced which states what to do after every combination.
 
-    #count the number of times the agent wins after the three decision
-    Tcnt=0
-    for (j in d[(d$code_id==number & d$decision==something), c("win")]) {
-        if (j == TRUE) {
-            Tcnt= Tcnt+1
+```{R}
+get_per <- function(choice_evaluate,data_frame,number) {
+
+    d = data_frame
+    # Count the numbers of times the pair made the same choice we are evaluating
+    num_chosen = 0
+    for (i in d$decision[d$code_id == number]) {
+        if (i == choice_evaluate) {
+            num_chosen = num_chosen + 1
         }
     }
-    #print(Tcnt)
-    p <- Tcnt/ccnt
+
+    # Count the number of times the agent wins by making that decision
+    num_wins = 0
+    for (j in d[ (d$code_id==number & d$decision==choice_evaluate) , c("win")]) {
+        if (j == TRUE) {
+            num_wins = num_wins + 1
+        }
+    }
+    if (num_chosen == 0) {
+        p <- 0
+    } else {
+        p <- num_wins/num_chosen
+    }
     return(p)
 }
 
-extract_statistics <- function( file_name) {
-    #d <- read.csv(file_name,header=TRUE,sep=",")
-    d= file_name
-    #colnames(d)[1] <- "code_id"
-    #colnames(d)[2] <- "decision"
-    #colnames(d)[3] <- "win"
+extract_statistics <- function(data_frame) {
+    d = data_frame
     str <- NULL
+
+    # Run statistics-gatherer for all 64 possible combinations.
     for (i in 0:63) {
-        per_c <- get_per("C", file_name,i)
-        #print("next")
-        per_d <- get_per("D", file_name,i)
-        #print(per_c)
-        #print(per_d)
-        if (is.na(per_c) | is.na(per_d)) {
-            #str <- paste(str, " ",sep="")
-            next
-        } else if (max(per_c,per_d)>=0.5) {
+
+        # Gather statistics about choices
+        per_c <- get_per("C",data_frame,i)
+        per_d <- get_per("D",data_frame,i)
+
+        # Make decision for what agent should do based on choices
+        if (per_c == per_d) {
+            str <- paste(str, "C",sep="") # Defaults to Defect
+        } else if (per_c > per_d) {
+            str <- paste(str, "C",sep="")
+        } else if (per_c < per_d) {
             str <- paste(str, "D",sep="")
         } else {
-            str <-paste(str, "C",sep="")
+            str <- paste(str, " ",sep="") # For debugging
         }
     }
     return(str)
 }
-
-#for testing
-#extract_statistics("test_statistics.csv")
-
 ```
 
-The string that was created from these scripts is CCCDCCCDCCCDCCCDCDCDCDDDCDDDDDDDCCCDCDDDCDDDDDDDDDDDCDCDCDDDDDDD. The agent will calculate the number that is in accordance with the last three meetings, this is the index for which number to take from the string.
-
-
-#string for now: "C","C","C","D","C","C","C","D","C","C","C","D","C","C","C","D","C","D","C","D","C","D","D","D","C","D","D","D","D","D","D","D","C","C","C","D","C","D","D","D","C","D","D","D","D","D","D","D","D","D","D","D","C","D","C","D","C","D","D","D","D","D","D","D"
-
-#string from pdf: "D","D","D","D","D","D","C","C","C","D","D","C","D","D","D","D","D","D","C","D","D","D","D","C","D","C","C","D","D","C","D","D","D","D","C","D","C","C","C","D","D","C","D","C","D","C","D","C","D","D","C","C","D","D","D","D","C","D","D","D","D","D","C","C"
+The output of the scripts was the following string: CCCDCCCDCCCDCCCDCDCDCDDDCDDDDDDDCCCDCDDDCDDDDDDDDDDDCDCDCDDDDDDD. This script was used during testing, but failed to beat tit for tat and other agents consistantly. Therefore, it was decided to use a string that we got from the paper by Mittal and Deb, namely: DDDDDDCCCDDCDDDDDDCDDDDCDCCDDCDDDDCDCCCDDCDCDCDCDDCCDDDDCDDDDDCCCDCCDD. After the code, the creating and the workings of the agent will be discussed.
 
 ```{R}
 library(R6)
 Agent <- R6Class("Agent",
-    #first we create different empty variables which are used by the agent during every round
     public = list(
-    bid = NULL,
-    book = NULL,
-    greeting = NULL,
-    id = NULL,
-    opponent_id = NULL,
-    opponent_greeting = NULL,
-    round = NULL,
-    response = NULL,
+        bid = NULL,
+        book = NULL,
+        greeting = NULL,
+        id = NULL,
+        opponent_id = NULL,
+        opponent_greeting = NULL,
+        round = NULL,
+        response = NULL,
 
-    #than we set some of these empty variables to standard information we get from the tournament about every round
-    set_book = function(book=NA) {
-        self$book <- book
-    },
+        set_book = function(book=NA) {
+            self$book <- book
+        },
 
-    set_id = function(id=NA) {
-        self$id = id
-    },
+        set_id = function(id=NA) {
+            self$id = id
+        },
 
-    set_opponent_id = function(opponent_id=NA) {
-        self$opponent_id = opponent_id
-    },
+        set_opponent_id = function(opponent_id=NA) {
+            self$opponent_id = opponent_id
+        },
 
-    set_response = function(response=NA) {
-        self$response <- response
-    },
+        set_response = function(response=NA) {
+            self$response <- response
+        },
 
-    set_round = function(round=NA) {
-        self$round <- round
-    },
+        set_round = function(round=NA) {
+            self$round <- round
+        },
 
-    set_greeting = function() {
-        greeting <- "Tit for tat always wins..."
-    },
+        set_greeting = function() {
+            greeting <- "Back to PRESTO..."
+        },
 
-    receive_greeting = function(greeting = NA) {
-        self$opponent_greeting = greeting
-    },
+        receive_greeting = function(greeting = NA) {
+            self$opponent_greeting = greeting
+        },
 
-    #the get_bid function decides what the agent does
-    get_bid = function() {
-        bid_vector <- c("cooperate","defect")
-        #here the agent checks the last three rounds it had played with this agent.
-        last_round <- tail(subset(self$book, (id1 == self$id | id2 == self$id) & (id1 == self$opponent_id | id2 == self$opponent_id)), 3)
-        #this is the created string that was made from the data from last year. Because of coding troubles it is a vector and not a string.
-        axelrod_seq <- c("D","D","D","D","D","D","C","C","C","D","C","D","D","D","D","D","D","C","D","D","D","D","C","D","C","C","D","D","C","D","D","D","D","C","D","C","C","C","D","D","C","D","C","D","C","D","C","D","D","C","C","D","D","D","D","C","D","D","D","D","D","C","C","C","D","C","C","D","D")
-        number <- 1
+        get_bid = function() {
+            bid_vector <- c("cooperate","defect")
+            last_move_self <- NA
+            last_move_opponent <- NA
+            last_round <- tail(subset(self$book, (id1 == self$id | id2 == self$id) & (id1 == self$opponent_id | id2 == self$opponent_id)), 3)
+            last_round_single <- tail(subset(self$book, (id1 == self$id | id2 == self$id) & (id1 == self$opponent_id | id2 == self$opponent_id)), 1)
+            axelrod_seq <- c("D","D","D","D","D","D","C","C","C","D","D","C","D","D","D","D","D","D","C","D","D","D","D","C","D","C","C","D","D","C","D","D","D","D","C","D","C","C","C","D","D","C","D","C","D","C","D","C","D","D","C","C","D","D","D","D","C","D","D","D","D","D","C","C","C","D","C","C","D","D")
+            number <- 1
 
-        if (nrow(last_round) < 3) {
-        self$bid <- bid_vector[1]
-        } else if ((last_round[3,1] == self$id) & (last_round[3,2] == self$opponent_id) & (last_round[3,4] == bid_vector[1]) & (last_round[3,5] == bid_vector[1])) {
-        number <- number + (4 * 4^2)
-        } else if ((last_round[3,1] == self$id) & (last_round[3,2] == self$opponent_id) & (last_round[3,4] == bid_vector[2]) & (last_round[3,5] == bid_vector[1])) {
-        number <- number + (1 * 4^2)
-        } else if ((last_round[3,1] == self$id) & (last_round[3,2] == self$opponent_id) & (last_round[3,4] == bid_vector[1]) & (last_round[3,5] == bid_vector[2])) {
-        number <- number + (2 * 4^2)
-        } else if ((last_round[3,1] == self$id) & (last_round[3,2] == self$opponent_id) & (last_round[3,4] == bid_vector[2]) & (last_round[3,5] == bid_vector[2])) {
-        number <- number + (0 * 4^2)
-        } else if ((last_round[3,1] == self$opponent_id) & (last_round[3,2] == self$id) & (last_round[3,4] == bid_vector[1]) & (last_round[3,5] == bid_vector[1])) {
-        number <- number + (4 * 4^2)
-        } else if ((last_round[3,1] == self$opponent_id) & (last_round[3,2] == self$id) & (last_round[3,4] == bid_vector[2]) & (last_round[3,5] == bid_vector[1])) {
-        number <- number + (2 * 4^2)
-        } else if ((last_round[3,1] == self$opponent_id) & (last_round[3,2] == self$id) & (last_round[3,4] == bid_vector[1]) & (last_round[3,5] == bid_vector[2])) {
-        number <- number + (1 * 4^2)
-        } else if ((last_round[3,1] == self$opponent_id) & (last_round[3,2] == self$id) & (last_round[3,4] == bid_vector[2]) & (last_round[3,5] == bid_vector[2])) {
-        number <- number + (0 * 4^2)
+            if (nrow(last_round_single) == 0)  {
+            } else if (last_round_single[1,1] == self$id) {
+            last_move_self <- last_round_single[1,4]
+            last_move_opponent <- last_round_single[1,5]
+            } else if (last_round_single[1,1] == self$opponent_id) {
+            last_move_self <- last_round_single[1,5]
+            last_move_opponent <- last_round_single[1,4]
+            }
+
+            if (nrow(last_round) == 3) {
+            } else if (nrow(last_round_single)==0) {
+            self$bid <- bid_vector[1]
+            } else if ((last_move_self == bid_vector[1]) & (last_move_opponent == bid_vector[1])) {
+            self$bid <- sample(bid_vector, 1, prob=c(4/5,1/5))
+            } else if ((last_move_self == bid_vector[1]) & (last_move_opponent == bid_vector[2])) {
+            self$bid <- sample(bid_vector, 1, prob=c(1/2,1/2))
+            } else if ((last_move_self == bid_vector[2]) & (last_move_opponent == bid_vector[1])) {
+            self$bid <- sample(bid_vector, 1, prob=c(2/5,3/5))
+            } else if ((last_move_self == bid_vector[2]) & (last_move_opponent == bid_vector[2])) {
+            self$bid <- bid_vector[2]
+            }
+
+            if (nrow(last_round) < 3) {
+            } else if ((last_round[3,1] == self$id) & (last_round[3,2] == self$opponent_id) & (last_round[3,4] == bid_vector[1]) & (last_round[3,5] == bid_vector[1])) {
+            number <- number + (3 * 4^2)
+            } else if ((last_round[3,1] == self$id) & (last_round[3,2] == self$opponent_id) & (last_round[3,4] == bid_vector[2]) & (last_round[3,5] == bid_vector[1])) {
+            number <- number + (1 * 4^2)
+            } else if ((last_round[3,1] == self$id) & (last_round[3,2] == self$opponent_id) & (last_round[3,4] == bid_vector[1]) & (last_round[3,5] == bid_vector[2])) {
+            number <- number + (2 * 4^2)
+            } else if ((last_round[3,1] == self$id) & (last_round[3,2] == self$opponent_id) & (last_round[3,4] == bid_vector[2]) & (last_round[3,5] == bid_vector[2])) {
+            number <- number + (0 * 4^2)
+            } else if ((last_round[3,1] == self$opponent_id) & (last_round[3,2] == self$id) & (last_round[3,4] == bid_vector[1]) & (last_round[3,5] == bid_vector[1])) {
+            number <- number + (3 * 4^2)
+            } else if ((last_round[3,1] == self$opponent_id) & (last_round[3,2] == self$id) & (last_round[3,4] == bid_vector[2]) & (last_round[3,5] == bid_vector[1])) {
+            number <- number + (2 * 4^2)
+            } else if ((last_round[3,1] == self$opponent_id) & (last_round[3,2] == self$id) & (last_round[3,4] == bid_vector[1]) & (last_round[3,5] == bid_vector[2])) {
+            number <- number + (1 * 4^2)
+            } else if ((last_round[3,1] == self$opponent_id) & (last_round[3,2] == self$id) & (last_round[3,4] == bid_vector[2]) & (last_round[3,5] == bid_vector[2])) {
+            number <- number + (0 * 4^2)
+            }
+
+            if (nrow(last_round) < 3) {
+            } else if ((last_round[2,1] == self$id) & (last_round[2,2] == self$opponent_id) & (last_round[2,4] == bid_vector[1]) & (last_round[2,5] == bid_vector[1])) {
+            number <- number + (3 * 4^1)
+            } else if ((last_round[2,1] == self$id) & (last_round[2,2] == self$opponent_id) & (last_round[2,4] == bid_vector[2]) & (last_round[2,5] == bid_vector[1])) {
+            number <- number + (1 * 4^1)
+            } else if ((last_round[2,1] == self$id) & (last_round[2,2] == self$opponent_id) & (last_round[2,4] == bid_vector[1]) & (last_round[2,5] == bid_vector[2])) {
+            number <- number + (2 * 4^1)
+            } else if ((last_round[2,1] == self$id) & (last_round[2,2] == self$opponent_id) & (last_round[2,4] == bid_vector[2]) & (last_round[2,5] == bid_vector[2])) {
+            number <- number + (0 * 4^1)
+            } else if ((last_round[2,1] == self$opponent_id) & (last_round[2,2] == self$id) & (last_round[2,4] == bid_vector[1]) & (last_round[2,5] == bid_vector[1])) {
+            number <- number + (3 * 4^1)
+            } else if ((last_round[2,1] == self$opponent_id) & (last_round[2,2] == self$id) & (last_round[2,4] == bid_vector[2]) & (last_round[2,5] == bid_vector[1])) {
+            number <- number + (2 * 4^1)
+            } else if ((last_round[2,1] == self$opponent_id) & (last_round[2,2] == self$id) & (last_round[2,4] == bid_vector[1]) & (last_round[2,5] == bid_vector[2])) {
+            number <- number + (1 * 4^1)
+            } else if ((last_round[2,1] == self$opponent_id) & (last_round[2,2] == self$id) & (last_round[2,4] == bid_vector[2]) & (last_round[2,5] == bid_vector[2])) {
+            number <- number + (0 * 4^1)
+            }
+
+            if (nrow(last_round) < 3) {
+            } else if ((last_round[1,1] == self$id) & (last_round[1,2] == self$opponent_id) & (last_round[2,4] == bid_vector[1]) & (last_round[2,5] == bid_vector[1])) {
+            number <- number + (3 * 4^0)
+            } else if ((last_round[1,1] == self$id) & (last_round[1,2] == self$opponent_id) & (last_round[1,4] == bid_vector[2]) & (last_round[1,5] == bid_vector[1])) {
+            number <- number + (1 * 4^0)
+            } else if ((last_round[1,1] == self$id) & (last_round[1,2] == self$opponent_id) & (last_round[1,4] == bid_vector[1]) & (last_round[1,5] == bid_vector[2])) {
+            number <- number + (2 * 4^0)
+            } else if ((last_round[1,1] == self$id) & (last_round[1,2] == self$opponent_id) & (last_round[1,4] == bid_vector[2]) & (last_round[1,5] == bid_vector[2])) {
+            number <- number + (0 * 4^0)
+            } else if ((last_round[1,1] == self$opponent_id) & (last_round[1,2] == self$id) & (last_round[1,4] == bid_vector[1]) & (last_round[1,5] == bid_vector[1])) {
+            number <- number + (3 * 4^0)
+            } else if ((last_round[1,1] == self$opponent_id) & (last_round[1,2] == self$id) & (last_round[1,4] == bid_vector[2]) & (last_round[1,5] == bid_vector[1])) {
+            number <- number + (2 * 4^0)
+            } else if ((last_round[1,1] == self$opponent_id) & (last_round[1,2] == self$id) & (last_round[1,4] == bid_vector[1]) & (last_round[1,5] == bid_vector[2])) {
+            number <- number + (1 * 4^0)
+            } else if ((last_round[1,1] == self$opponent_id) & (last_round[1,2] == self$id) & (last_round[1,4] == bid_vector[2]) & (last_round[1,5] == bid_vector[2])) {
+            number <- number + (0 * 4^0)
+            }
+
+            if (nrow(last_round) < 3) {
+            } else if (axelrod_seq[number] == "D") {
+            self$bid <- bid_vector[2]
+            } else if (axelrod_seq[number] == "C") {
+            self$bid <- bid_vector[1]
+            }
+
+        },
+
+        formulate_bid = function() {
+            self$get_bid()
         }
-
-        if (nrow(last_round) < 3) {
-        self$bid <- bid_vector[1]
-        } else if ((last_round[2,1] == self$id) & (last_round[2,2] == self$opponent_id) & (last_round[2,4] == bid_vector[1]) & (last_round[2,5] == bid_vector[1])) {
-        number <- number + (4 * 4^1)
-        } else if ((last_round[2,1] == self$id) & (last_round[2,2] == self$opponent_id) & (last_round[2,4] == bid_vector[2]) & (last_round[2,5] == bid_vector[1])) {
-        number <- number + (1 * 4^1)
-        } else if ((last_round[2,1] == self$id) & (last_round[2,2] == self$opponent_id) & (last_round[2,4] == bid_vector[1]) & (last_round[2,5] == bid_vector[2])) {
-        number <- number + (2 * 4^1)
-        } else if ((last_round[2,1] == self$id) & (last_round[2,2] == self$opponent_id) & (last_round[2,4] == bid_vector[2]) & (last_round[2,5] == bid_vector[2])) {
-        number <- number + (0 * 4^1)
-        } else if ((last_round[2,1] == self$opponent_id) & (last_round[2,2] == self$id) & (last_round[2,4] == bid_vector[1]) & (last_round[2,5] == bid_vector[1])) {
-        number <- number + (4 * 4^1)
-        } else if ((last_round[2,1] == self$opponent_id) & (last_round[2,2] == self$id) & (last_round[2,4] == bid_vector[2]) & (last_round[2,5] == bid_vector[1])) {
-        number <- number + (2 * 4^1)
-        } else if ((last_round[2,1] == self$opponent_id) & (last_round[2,2] == self$id) & (last_round[2,4] == bid_vector[1]) & (last_round[2,5] == bid_vector[2])) {
-        number <- number + (1 * 4^1)
-        } else if ((last_round[2,1] == self$opponent_id) & (last_round[2,2] == self$id) & (last_round[2,4] == bid_vector[2]) & (last_round[2,5] == bid_vector[2])) {
-        number <- number + (0 * 4^1)
-        }
-
-        if (nrow(last_round) < 3) {
-        self$bid <- bid_vector[1]
-        } else if ((last_round[1,1] == self$id) & (last_round[1,2] == self$opponent_id) & (last_round[2,4] == bid_vector[1]) & (last_round[2,5] == bid_vector[1])) {
-        number <- number + (4 * 4^0)
-        } else if ((last_round[1,1] == self$id) & (last_round[1,2] == self$opponent_id) & (last_round[1,4] == bid_vector[2]) & (last_round[1,5] == bid_vector[1])) {
-        number <- number + (1 * 4^0)
-        } else if ((last_round[1,1] == self$id) & (last_round[1,2] == self$opponent_id) & (last_round[1,4] == bid_vector[1]) & (last_round[1,5] == bid_vector[2])) {
-        number <- number + (2 * 4^0)
-        } else if ((last_round[1,1] == self$id) & (last_round[1,2] == self$opponent_id) & (last_round[1,4] == bid_vector[2]) & (last_round[1,5] == bid_vector[2])) {
-        number <- number + (0 * 4^0)
-        } else if ((last_round[1,1] == self$opponent_id) & (last_round[1,2] == self$id) & (last_round[1,4] == bid_vector[1]) & (last_round[1,5] == bid_vector[1])) {
-        number <- number + (4 * 4^0)
-        } else if ((last_round[1,1] == self$opponent_id) & (last_round[1,2] == self$id) & (last_round[1,4] == bid_vector[2]) & (last_round[1,5] == bid_vector[1])) {
-        number <- number + (2 * 4^0)
-        } else if ((last_round[1,1] == self$opponent_id) & (last_round[1,2] == self$id) & (last_round[1,4] == bid_vector[1]) & (last_round[1,5] == bid_vector[2])) {
-        number <- number + (1 * 4^0)
-        } else if ((last_round[1,1] == self$opponent_id) & (last_round[1,2] == self$id) & (last_round[1,4] == bid_vector[2]) & (last_round[1,5] == bid_vector[2])) {
-        number <- number + (0 * 4^0)
-        }
-
-        if (axelrod_seq[number] == "D") {
-        self$bid <- bid_vector[2]
-        } else {
-        self$bid <- bid_vector[1]
-        }
-
-        #there're agents who only defect in the tournament. Their greeting is "Lemon!", because the only answer to defect is to defect as well, the agent checks the greeting of the opponent.
-        if (self$opponent_greeting == "Lemon!") {
-        self$bid <- bid_vector[2]
-        }
-    },
-
-    formulate_bid = function() {
-        self$get_bid()
-    }
     )
 )
-
 ```
-
-This agent should beat tit for tat according to the paper by Mittal and Ded, however this hasn't been proven yet. It's optimised for some agents of last year, so it might be inefficient for the agent of this year.
-
 
 ### Comments on proces and code
 We started off on our process by reading the paper by Mittal and Deb. From this paper we got the idea to create our own 64 bit string. To make this we ran into some problems. We used the data from last year to begin with, but this didn't seem to work that well with some agents we ran together with our own agent. After tweaking our string we eventually went with the string from the paper. Our agent also has a part which is tit for tat. This is created for in the beginning, but we eventually went for defecting the first three times we meet a new agent. After these three meetings we can use the string.
