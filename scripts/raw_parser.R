@@ -58,6 +58,8 @@ axelrod_code = function(bid1, bid2) {
 }
 
 axelrod_encode = function(a_code) {
+    # Takes a vector of behaviour and turns it into a useful data frame for data analysis
+
     num_agents = nrow(a_code) # Determine number of agents, n, in 'n x n' matrix input
     code_id = decision = win = c()
 
@@ -93,6 +95,3 @@ axelrod_encode = function(a_code) {
     }
     return(data.frame(code_id,decision,win,stringsAsFactors = FALSE))
 }
-
-## For testing
-# raw_parser("validate.csv")

@@ -25,31 +25,26 @@ get_per <- function(choice_evaluate,data_frame,number) {
 }
 
 extract_statistics <- function(data_frame) {
-    #d <- read.csv(data_frame,header=TRUE,sep=",")
     d = data_frame
-    #colnames(d)[1] <- "code_id"
-    #colnames(d)[2] <- "decision"
-    #colnames(d)[3] <- "win"
     str <- NULL
+
+    # Run statistics-gatherer for all 64 possible combinations.
     for (i in 0:63) {
 
         # Gather statistics about choices
         per_c <- get_per("C",data_frame,i)
         per_d <- get_per("D",data_frame,i)
-        # print(sprintf("I:%2.i     per_c:%.3f      per_d:%.3f",i,per_c,per_d))
 
         # Make decision for what agent should do based on choices
         if (per_c == per_d) {
-            str <- paste(str, "C",sep="")
+            str <- paste(str, "D",sep="") # Defaults to Defect
         } else if (per_c > per_d) {
             str <- paste(str, "C",sep="")
         } else if (per_c < per_d) {
             str <- paste(str, "D",sep="")
         } else {
-            str <- paste(str, " ",sep="")
+            str <- paste(str, " ",sep="") # For debugging
         }
     }
     return(str)
 }
-
-#extract_statistics("test_statistics.csv")
