@@ -81,15 +81,10 @@ Like Naive Prober, but it tries to break the series of mutual defections after d
 
 The concept of our agent is based on the fact that for each move in the game there are four possibilities. Both players can cooperate (CC or R for reward), the first player cooperats and the other player defects (CD or S for sucker), the first player can defect and the second cooperates (DC or T for temptation), or both players defect (DD or P for penalty). For our strategie we consider the last three moves as a three letter code. For instance, the situation is which the last three rounds both agents cooperated, has a three letter sequence RRR.
 
-This combination of letters is used to generate a number 0:63. This is done by setting R=0, T=1, S=2 and P=3 and interpret it as a number on base 4. SSP for instance is 43 is this way. Each of the numbers 0:63 either stands for defect or cooperate, therefore based on the last 3 moves a option is selected. Since this decision is based upon the last the 3 moves, the first three moves cannot be defined by this strategy. For this reason these are defected.
+This combination of letters is used to generate a number 0:63. This is done by setting R=0, T=1, S=2 and P=3 and interpret it as a number on base 4. This will result in the next formula: points round 1 * 4^2 + points round 2 *4^1 + points round 3 * 4^0. SSP for instance is 43 is this way. Each of the numbers 0:63 either stands for defect or cooperate, therefore based on the last 3 moves a option is selected. Since this decision is based upon the last the 3 moves, the first three moves cannot be defined by this strategy. For this reason these are defected.
 
-An Exception is made for the so called "lemon agents", these agents are introducing themselves by saying "lemon" and will always cheat. For this reason, in a situation of an opponent that introduces itself by "lemon" the defect option is always selected.
+An Exception is made for the so called "lemon agents", these agents are introducing themselves by saying "Lemon!." and will always cheat. For this reason, in a situation of an opponent that introduces itself by "Lemon!." the defect option is always selected.
 
-### Creating the 64 bit string
-
-As stated before, based on the three letter sequence, converted to a number 0:63, the decision to either defect or cooperate is made. In order to do so each each number 0:63 has a label " defect" or " cooperate". This so called "string" of number is designed by..
-
-(in some subcatogories)....
 
 Main.R looks as follows
 ```{R}
@@ -105,8 +100,6 @@ data_frame = axelrod_encode(raw_parser('data/tournament.csv'))
 axelrod_string = extract_statistics(data_frame)
 View(axelrod_string)
 ```
-
-Before we go into details about our code we first have to make our own 64 bit string. This is done by running the 'main.R' script. This script calls two different scripts, 'raw_parser.R' en 'extract_statistics.R'. The script 'raw_parser.R' looks at the data from the tournament from last year. The script goes through all the played rounds and looks at the pairs of agents that played. These pairs are than sorted and looked at with help of the payoff matrix. The interaction of the agent is translated into a letter. If both players cooperate is called reward (R) and gives us 3 points. If player one cooperates, but player two defects it is called sucker (S) and there are no points for player one. Temptation (T) is the opposite of sucker and rewards player one with 5 points. If both players defect it's called penalty (P) and both get 1 point.
 
 raw_parser.R looks as follows
 ```{R}
@@ -215,7 +208,6 @@ axelrod_encode = function(a_code) {
 # raw_parser("validate.csv")
 ```
 
-After every meeting between a pair of agents has been translated into a letter, the code will look at sets of 3 meetings. For 3 meetings there're 64 different combinations. The 3 meetings can be expressed in a number by following the following formula: points round 1 * 4^2 = points round 2 *4^1 + points round 3 * 4^0. This formula will give a number between 0 and 63, as to organize the different meeting possibilities. Next the script will safe if the following meeting, the fourth, was won by agent one or agent two and what was played by either. This information is saved and used in the next script, 'extract_statistics.R'. This code looks at which tactic is to do after every combination. This is done by looking at who played what and what the winning percentage is. A win is reward or temptation, this is because another option would have lessend the points. The script returns a string which is 64 digits long and contains C, for cooperate, or D, for defect. This letter represents what the agent should do when it encounters a combination of three meetings.
 
 extract_statistics.R looks as follows
 ```{R}
