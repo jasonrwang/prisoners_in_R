@@ -1,23 +1,18 @@
 raw_parser = function(file_name) {
 
-    tourn_raw = read.csv(file_name,sep=",",stringsAsFactors = FALSE)
+    tourn_raw = read.csv(file_name,sep=";",stringsAsFactors = FALSE)
     num_agents = max(unique(tourn_raw$id1)) # Only works if IDs are sequential!
-    outcome_sequences = array(data=NA,dim=c(num_agents,num_agents,40)) # 40 is wasteful. See improvement suggestion below.
+    outcome_sequences = array(data=NA,dim=c(num_agents,num_agents,10000)) # 60 is wasteful. See improvement suggestion below.
     # typeof(outcome_sequences) ## just for testing
 
     ## To get data about the number of games played between each pair
     # seq_length_list = c()
 
-    for (i_id1 in seq(num_agents)) { # The "attacking" agent
-        id1_index = which(tourn_raw$id1 %in% i_id1) # Find where agent #i_id1 plays
+    for (i_id1 in seq(num_agents-1)) { # Iterate through all the agents
+        id1_index = which(tourn_raw$id1 %in% i_id1 | tourn_raw$id2 %in% i_id1) # Find where agent plays
 
-        for (i_id2 in seq(num_agents)) { # The "defending" agent
-            # Agents cannot play themselves, so skip in this case.
-            if (i_id1 == i_id2) { # This could be improved by stripping i_id1 from i_id2's for loop declaration
-                next
-            }
-
-            id2_index = which(tourn_raw$id2 %in% i_id2) # Find where agent #i_id2 plays
+        for (i_id2 in seq(i_id1+1,num_agents)) { # Iterate through remaining combinations
+            id2_index = which(tourn_raw$id1 %in% i_id2 | tourn_raw$id2 %in% i_id2) # Find where agent #i_id2 plays
 
             ## The below can be an improvement, but doesn't quite work yet.
             ## The "list" cannot replace the single element.
@@ -46,15 +41,15 @@ axelrod_code = function(bid1, bid2) {
     }
     else if (bid1 == 'cooperate') {
        if (bid1 == bid2) { # CC -> R -> 3
-            return("R")
+            return(3)
        } else { # CD -> S -> 2
-            return("S")
+            return(2)
        }
     }  else if (bid1 == 'defect') {
         if (bid1 == bid2) { # DD -> P -> 0
-            return("P")
+            return(0)
         } else { # DC -> T -> 1
-            return("T")
+            return(1)
         }
     } else {
        print("Error in cooperate-defect matching!")
@@ -96,7 +91,7 @@ axelrod_encode = function(a_code) {
             }
         }
     }
-    return(data.frame(code_id,decision,win, stringsAsFactors = FALSE))
+    return(data.frame(code_id,decision,win,stringsAsFactors = FALSE))
 }
 
 ## For testing

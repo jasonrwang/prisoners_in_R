@@ -1,47 +1,52 @@
-get_per <- function(something, file_name,number) {
-    #d <- read.csv(file_name,header=TRUE,sep=",")
-    d=file_name
-    #count the numbers of times the pair made the same decision
-    ccnt=0
-    for (i in d$decision[d$code_id == number]) {
-        if (i == something) {
-            ccnt= ccnt+1
-        }
-    }
-    #print(ccnt)
+get_per <- function(choice_evaluate,data_frame,number) {
 
-    #count the number of times the agent wins after the three decision
-    Tcnt=0
-    for (j in d[(d$code_id==number & d$decision==something), c("win")]) {
-        if (j == TRUE) {
-            Tcnt= Tcnt+1
+    d = data_frame
+    # Count the numbers of times the pair made the same choice we are evaluating
+    num_chosen = 0
+    for (i in d$decision[d$code_id == number]) {
+        if (i == choice_evaluate) {
+            num_chosen = num_chosen + 1
         }
     }
-    #print(Tcnt)
-    p <- Tcnt/ccnt
+
+    # Count the number of times the agent wins by making that decision
+    num_wins = 0
+    for (j in d[ (d$code_id==number & d$decision==choice_evaluate) , c("win")]) {
+        if (j == TRUE) {
+            num_wins = num_wins + 1
+        }
+    }
+    if (num_chosen == 0) {
+        p <- 0
+    } else {
+        p <- num_wins/num_chosen
+    }
     return(p)
 }
 
-extract_statistics <- function( file_name) {
-    #d <- read.csv(file_name,header=TRUE,sep=",")
-    d= file_name
+extract_statistics <- function(data_frame) {
+    #d <- read.csv(data_frame,header=TRUE,sep=",")
+    d = data_frame
     #colnames(d)[1] <- "code_id"
     #colnames(d)[2] <- "decision"
     #colnames(d)[3] <- "win"
     str <- NULL
     for (i in 0:63) {
-        per_c <- get_per("C", file_name,i)
-        #print("next")
-        per_d <- get_per("D", file_name,i)
-        #print(per_c)
-        #print(per_d)
-        if (is.na(per_c) | is.na(per_d)) {
-            #str <- paste(str, " ",sep="")
-            next
-        } else if (max(per_c,per_d)>=0.5) {
+
+        # Gather statistics about choices
+        per_c <- get_per("C",data_frame,i)
+        per_d <- get_per("D",data_frame,i)
+        # print(sprintf("I:%2.i     per_c:%.3f      per_d:%.3f",i,per_c,per_d))
+
+        # Make decision for what agent should do based on choices
+        if (per_c == per_d) {
+            str <- paste(str, "C",sep="")
+        } else if (per_c > per_d) {
+            str <- paste(str, "C",sep="")
+        } else if (per_c < per_d) {
             str <- paste(str, "D",sep="")
         } else {
-            str <-paste(str, "C",sep="")
+            str <- paste(str, " ",sep="")
         }
     }
     return(str)
