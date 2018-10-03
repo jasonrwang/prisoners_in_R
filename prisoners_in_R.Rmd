@@ -407,6 +407,8 @@ Agent <- R6Class("Agent",
 
 ```
 
+This agent should beat tit for tat according to the paper by Mittal and Ded, however this hasn't been proven yet. It's optimised for some agents of last year, so it might be inefficient for the agent of this year.
+
 
 [1] S. Mittal and K. Deb, “Optimal Strategies of the Iterated Prisoner’s Dilemma Problem for Multiple Conflicting Objectives,” IEEE Trans. Evol. Comput., vol. 13, no. 3, pp. 554–565, Jun. 2009.
 
