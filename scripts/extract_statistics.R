@@ -37,7 +37,7 @@ extract_statistics <- function(data_frame) {
 
         # Make decision for what agent should do based on choices
         if (per_c == per_d) {
-            str <- paste(str, "D",sep="") # Defaults to Defect
+            str <- paste(str, "C",sep="") # Defaults to Defect
         } else if (per_c > per_d) {
             str <- paste(str, "C",sep="")
         } else if (per_c < per_d) {
