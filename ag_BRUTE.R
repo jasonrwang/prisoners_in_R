@@ -42,33 +42,33 @@ Agent <- R6Class("Agent",
                            get_bid = function() {
                              bid_vector <- c("cooperate","defect")
                              last_round <- tail(subset(self$book, (id1 == self$id | id2 == self$id) & (id1 == self$opponent_id | id2 == self$opponent_id)), 3)
-                             axelrod_seq <- c("D","D","D","D","D","D","C","C","C","D","C","D","D","D","D","D","D","C","D","D","D","D","C","D","C","C","D","D","C","D","D","D","D","C","D","C","C","C","D","D","C","D","C","D","C","D","C","D","D","C","C","D","D","D","D","C","D","D","D","D","D","C","C","C","D","C","C","D","D")
+                             axelrod_seq <- c("C","C","C","D","C","C","C","D","C","C","C","D","C","C","C","D","C","D","C","D","C","D","D","D","C","D","D","D","D","D","D","D","C","C","C","D","C","D","D","D","C","D","D","D","D","D","D","D","D","D","D","D","C","D","C","D","C","D","D","D","D","D","D","D")
                              number <- 1
                              
                              if (nrow(last_round) < 3) {
-                               self$bid <- bid_vector[1]
-                             } else if ((last_round[3,1] == self$id) & (last_round[3,2] == self$opponent_id) & (last_round[3,4] == bid_vector[1]) & (last_round[3,5] == bid_vector[1])) {
-                             number <- number + (4 * 4^2)
-                             } else if ((last_round[3,1] == self$id) & (last_round[3,2] == self$opponent_id) & (last_round[3,4] == bid_vector[2]) & (last_round[3,5] == bid_vector[1])) {
+                               self$bid <- bid_vector[2]
+                             } else if ((last_round[1,1] == self$id) & (last_round[1,2] == self$opponent_id) & (last_round[1,4] == bid_vector[1]) & (last_round[1,5] == bid_vector[1])) {
+                             number <- number + (3 * 4^2)
+                             } else if ((last_round[1,1] == self$id) & (last_round[1,2] == self$opponent_id) & (last_round[1,4] == bid_vector[2]) & (last_round[1,5] == bid_vector[1])) {
                              number <- number + (1 * 4^2)
-                             } else if ((last_round[3,1] == self$id) & (last_round[3,2] == self$opponent_id) & (last_round[3,4] == bid_vector[1]) & (last_round[3,5] == bid_vector[2])) {
+                             } else if ((last_round[1,1] == self$id) & (last_round[1,2] == self$opponent_id) & (last_round[1,4] == bid_vector[1]) & (last_round[1,5] == bid_vector[2])) {
                              number <- number + (2 * 4^2)
-                             } else if ((last_round[3,1] == self$id) & (last_round[3,2] == self$opponent_id) & (last_round[3,4] == bid_vector[2]) & (last_round[3,5] == bid_vector[2])) {
+                             } else if ((last_round[1,1] == self$id) & (last_round[1,2] == self$opponent_id) & (last_round[1,4] == bid_vector[2]) & (last_round[1,5] == bid_vector[2])) {
                              number <- number + (0 * 4^2)
-                             } else if ((last_round[3,1] == self$opponent_id) & (last_round[3,2] == self$id) & (last_round[3,4] == bid_vector[1]) & (last_round[3,5] == bid_vector[1])) {
-                             number <- number + (4 * 4^2)
-                             } else if ((last_round[3,1] == self$opponent_id) & (last_round[3,2] == self$id) & (last_round[3,4] == bid_vector[2]) & (last_round[3,5] == bid_vector[1])) {
+                             } else if ((last_round[1,1] == self$opponent_id) & (last_round[1,2] == self$id) & (last_round[1,4] == bid_vector[1]) & (last_round[1,5] == bid_vector[1])) {
+                             number <- number + (3 * 4^2)
+                             } else if ((last_round[1,1] == self$opponent_id) & (last_round[1,2] == self$id) & (last_round[1,4] == bid_vector[2]) & (last_round[1,5] == bid_vector[1])) {
                              number <- number + (2 * 4^2)
-                             } else if ((last_round[3,1] == self$opponent_id) & (last_round[3,2] == self$id) & (last_round[3,4] == bid_vector[1]) & (last_round[3,5] == bid_vector[2])) {
+                             } else if ((last_round[1,1] == self$opponent_id) & (last_round[1,2] == self$id) & (last_round[1,4] == bid_vector[1]) & (last_round[1,5] == bid_vector[2])) {
                              number <- number + (1 * 4^2)
-                             } else if ((last_round[3,1] == self$opponent_id) & (last_round[3,2] == self$id) & (last_round[3,4] == bid_vector[2]) & (last_round[3,5] == bid_vector[2])) {
+                             } else if ((last_round[1,1] == self$opponent_id) & (last_round[1,2] == self$id) & (last_round[1,4] == bid_vector[2]) & (last_round[1,5] == bid_vector[2])) {
                              number <- number + (0 * 4^2)
                              }
                              
                              if (nrow(last_round) < 3) {
-                               self$bid <- bid_vector[1]
+                               self$bid <- bid_vector[2]
                              } else if ((last_round[2,1] == self$id) & (last_round[2,2] == self$opponent_id) & (last_round[2,4] == bid_vector[1]) & (last_round[2,5] == bid_vector[1])) {
-                               number <- number + (4 * 4^1)
+                               number <- number + (3 * 4^1)
                              } else if ((last_round[2,1] == self$id) & (last_round[2,2] == self$opponent_id) & (last_round[2,4] == bid_vector[2]) & (last_round[2,5] == bid_vector[1])) {
                                number <- number + (1 * 4^1)
                              } else if ((last_round[2,1] == self$id) & (last_round[2,2] == self$opponent_id) & (last_round[2,4] == bid_vector[1]) & (last_round[2,5] == bid_vector[2])) {
@@ -76,7 +76,7 @@ Agent <- R6Class("Agent",
                              } else if ((last_round[2,1] == self$id) & (last_round[2,2] == self$opponent_id) & (last_round[2,4] == bid_vector[2]) & (last_round[2,5] == bid_vector[2])) {
                                number <- number + (0 * 4^1)
                              } else if ((last_round[2,1] == self$opponent_id) & (last_round[2,2] == self$id) & (last_round[2,4] == bid_vector[1]) & (last_round[2,5] == bid_vector[1])) {
-                               number <- number + (4 * 4^1)
+                               number <- number + (3 * 4^1)
                              } else if ((last_round[2,1] == self$opponent_id) & (last_round[2,2] == self$id) & (last_round[2,4] == bid_vector[2]) & (last_round[2,5] == bid_vector[1])) {
                                number <- number + (2 * 4^1)
                              } else if ((last_round[2,1] == self$opponent_id) & (last_round[2,2] == self$id) & (last_round[2,4] == bid_vector[1]) & (last_round[2,5] == bid_vector[2])) {
@@ -86,30 +86,31 @@ Agent <- R6Class("Agent",
                              }
                              
                              if (nrow(last_round) < 3) {
-                               self$bid <- bid_vector[1]
-                             } else if ((last_round[1,1] == self$id) & (last_round[1,2] == self$opponent_id) & (last_round[2,4] == bid_vector[1]) & (last_round[2,5] == bid_vector[1])) {
-                               number <- number + (4 * 4^0)
-                             } else if ((last_round[1,1] == self$id) & (last_round[1,2] == self$opponent_id) & (last_round[1,4] == bid_vector[2]) & (last_round[1,5] == bid_vector[1])) {
+                               self$bid <- bid_vector[2]
+                             } else if ((last_round[3,1] == self$id) & (last_round[3,2] == self$opponent_id) & (last_round[3,4] == bid_vector[1]) & (last_round[3,5] == bid_vector[1])) {
+                               number <- number + (3 * 4^0)
+                             } else if ((last_round[3,1] == self$id) & (last_round[3,2] == self$opponent_id) & (last_round[3,4] == bid_vector[2]) & (last_round[3,5] == bid_vector[1])) {
                                number <- number + (1 * 4^0)
-                             } else if ((last_round[1,1] == self$id) & (last_round[1,2] == self$opponent_id) & (last_round[1,4] == bid_vector[1]) & (last_round[1,5] == bid_vector[2])) {
+                             } else if ((last_round[3,1] == self$id) & (last_round[3,2] == self$opponent_id) & (last_round[3,4] == bid_vector[1]) & (last_round[3,5] == bid_vector[2])) {
                                number <- number + (2 * 4^0)
-                             } else if ((last_round[1,1] == self$id) & (last_round[1,2] == self$opponent_id) & (last_round[1,4] == bid_vector[2]) & (last_round[1,5] == bid_vector[2])) {
+                             } else if ((last_round[3,1] == self$id) & (last_round[3,2] == self$opponent_id) & (last_round[3,4] == bid_vector[2]) & (last_round[3,5] == bid_vector[2])) {
                                number <- number + (0 * 4^0)
-                             } else if ((last_round[1,1] == self$opponent_id) & (last_round[1,2] == self$id) & (last_round[1,4] == bid_vector[1]) & (last_round[1,5] == bid_vector[1])) {
-                               number <- number + (4 * 4^0)
-                             } else if ((last_round[1,1] == self$opponent_id) & (last_round[1,2] == self$id) & (last_round[1,4] == bid_vector[2]) & (last_round[1,5] == bid_vector[1])) {
+                             } else if ((last_round[3,1] == self$opponent_id) & (last_round[3,2] == self$id) & (last_round[3,4] == bid_vector[1]) & (last_round[3,5] == bid_vector[1])) {
+                               number <- number + (3 * 4^0)
+                             } else if ((last_round[3,1] == self$opponent_id) & (last_round[3,2] == self$id) & (last_round[3,4] == bid_vector[2]) & (last_round[3,5] == bid_vector[1])) {
                                number <- number + (2 * 4^0)
-                             } else if ((last_round[1,1] == self$opponent_id) & (last_round[1,2] == self$id) & (last_round[1,4] == bid_vector[1]) & (last_round[1,5] == bid_vector[2])) {
+                             } else if ((last_round[3,1] == self$opponent_id) & (last_round[3,2] == self$id) & (last_round[3,4] == bid_vector[1]) & (last_round[3,5] == bid_vector[2])) {
                                number <- number + (1 * 4^0)
-                             } else if ((last_round[1,1] == self$opponent_id) & (last_round[1,2] == self$id) & (last_round[1,4] == bid_vector[2]) & (last_round[1,5] == bid_vector[2])) {
+                             } else if ((last_round[3,1] == self$opponent_id) & (last_round[3,2] == self$id) & (last_round[3,4] == bid_vector[2]) & (last_round[3,5] == bid_vector[2])) {
                                number <- number + (0 * 4^0)
                              }
                              
-                             if (axelrod_seq[number] == "D") {
+                             if (axelrod_seq[number] == "C") {
                                self$bid <- bid_vector[2]
-                             } else {
+                             } else if (axelrod_seq[number] == "D") {
                                self$bid <- bid_vector[1]
                              }
+                             
                            },
                            
                            formulate_bid = function() {
