@@ -38,10 +38,12 @@ extract_statistics <- function( file_name) {
         if (is.na(per_c) | is.na(per_d)) {
             #str <- paste(str, " ",sep="")
             next
-        } else if (max(per_c,per_d)>=0.5) {
-            str <- paste(str, "D",sep="")
+        } else if (per_c > per_d) {
+            str <- paste(str, "C",sep="")
+        } else if (per_c < per_d) {
+            str <-paste(str, "D",sep="")
         } else {
-            str <-paste(str, "C",sep="")
+            str <-paste(str, "NA",sep="")
         }
     }
     return(str)
