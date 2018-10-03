@@ -1,6 +1,6 @@
 raw_parser = function(file_name) {
 
-    tourn_raw = read.csv(file_name,sep=",",stringsAsFactors = FALSE)
+    tourn_raw = read.csv(file_name,sep=";",stringsAsFactors = FALSE)
     num_agents = max(unique(tourn_raw$id1)) # Only works if IDs are sequential!
     outcome_sequences = array(data=NA,dim=c(num_agents,num_agents,60)) # 60 is wasteful. See improvement suggestion below.
     # typeof(outcome_sequences) ## just for testing
