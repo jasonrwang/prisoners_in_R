@@ -2,7 +2,7 @@ raw_parser = function(file_name) {
 
     tourn_raw = read.csv(file_name,sep=";",stringsAsFactors = FALSE)
     num_agents = max(unique(tourn_raw$id1)) # Only works if IDs are sequential!
-    outcome_sequences = array(data=NA,dim=c(num_agents,num_agents,60)) # 60 is wasteful. See improvement suggestion below.
+    outcome_sequences = array(data=NA,dim=c(num_agents,num_agents,10000)) # 60 is wasteful. See improvement suggestion below.
     # typeof(outcome_sequences) ## just for testing
 
     ## To get data about the number of games played between each pair
@@ -58,6 +58,8 @@ axelrod_code = function(bid1, bid2) {
 }
 
 axelrod_encode = function(a_code) {
+    # Takes a vector of behaviour and turns it into a useful data frame for data analysis
+
     num_agents = nrow(a_code) # Determine number of agents, n, in 'n x n' matrix input
     code_id = decision = win = c()
 
@@ -91,8 +93,5 @@ axelrod_encode = function(a_code) {
             }
         }
     }
-    return(data.frame(code_id,decision,win, stringsAsFactors = FALSE))
+    return(data.frame(code_id,decision,win,stringsAsFactors = FALSE))
 }
-
-## For testing
-# raw_parser("validate.csv")

@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 #setwd("C:/Users/yugde/OneDrive/EPA/EPA1315/Tournament") #Change this directory to where your files are stored
 myScriptName <- "myDefector.R"
-numberOfrounds <- sample(700:1000, 1) #Value for number of rounds is randomly picked in the range of 700:1000
+numberOfrounds <- sample(4000:8000, 1) #Value for number of rounds is randomly picked in the range of 700:1000
 x = c("cooperate","cooperate","defect","defect")
 y = c("cooperate","defect","cooperate","defect")
 z = c(4,0,5,2)
