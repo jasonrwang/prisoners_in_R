@@ -59,7 +59,7 @@ Plays C, C, D periodically.
 Cooperates on the first move, and defects only when the opponent defects two times. Compared to the regular tit for tat, this strategy is more socially oriented.
 
 #### 12. Soft Majority
-Begins by cooperating, and cooperates as long as the number of times the opponent has cooperated is greater than or equal to the number of times it has defected, else it defects.
+Begins by cooperating, and cooperates as long as the number of times the opponent has cooperated is greater than or equal to the number of times it has defected. When this is no longer the case it defects.
 
 #### 13, Hard Majority
 Defects on the first move, and defects if the number of defections of the opponent is greater than or equal to the number of times it has cooperated, else cooperates.
@@ -116,3 +116,5 @@ a = 123
 ```
 
 [1] S. Mittal and K. Deb, “Optimal Strategies of the Iterated Prisoner’s Dilemma Problem for Multiple Conflicting Objectives,” IEEE Trans. Evol. Comput., vol. 13, no. 3, pp. 554–565, Jun. 2009.
+
+[2] R. Axelrod, “The evolution of strategies in the iterated prisoner’s dilemma,” in Genetic Algorithms and Simulated Annealing, L. Davis, Ed. Los Altos, CA: Morgan Kaufmann, 1987.
