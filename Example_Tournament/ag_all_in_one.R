@@ -39,15 +39,37 @@ Agent <- R6Class("Agent",
                              self$opponent_greeting = greeting
                            },
 
+                           check_moves <- function() {
 
-                           check_greeting  <- function() {
-                              if (self$opponent_greeting == "Lemon!") {
+                           },
+
+
+                           get_bid = function() {
+                             bid_vector <- c("cooperate","defect")
+                             last_move_self <- NA
+                             last_move_opponent <- NA
+                             last_round <- tail(subset(self$book, (id1 == self$id | id2 == self$id) & (id1 == self$opponent_id | id2 == self$opponent_id)), 3)
+
+                             if (nrow(last_round) == 0)  {
+                             } else if (last_round[2,1] == self$opponent_id) {
+                               last_move_self <- last_round[2,5]
+                               last_move_opponent <- last_round[2,4]
+                             } else if (last_round[2,2] == self$opponent_id) {
+                               last_move_self <- last_round[2,4]
+                               last_move_opponent <- last_round[2,5]
+                              } else if (last_round[1,1] == self$opponent_id) {
+                               last_move_self <- last_round[1,5]
+                               last_move_opponent <- last_round[1,4]
+                             } else if (last_round[1,2] == self$opponent_id) {
+                               last_move_self <- last_round[1,4]
+                               last_move_opponent <- last_round[1,5]
+                             }
+
+                             if (self$opponent_greeting == "Lemon!") {
                                 self$bid <- bid_vector[2]
                                 break
                               }
-                           },
 
-                           assign_value <- function(x) {
                              number = 1
 
                              for (i in rev(seq(3))) {
@@ -69,50 +91,8 @@ Agent <- R6Class("Agent",
                                 }
 
                                }
-                             }
 
-                             return(number)
-
-                             """
-                             CC = 4
-                             CD = 2
-                             DC = 1
-                             DD = 0
-
-
-                             """
-                           },
-
-                           string_three_plus <- function() {
-                             axelrod_seq <- ("CDCCCDDDCCCDDDCDCDDDCDDDDCDDDDDDCCCDCDDDCCCDCCDDCDDDCDDDDCDDDDDD")
-                             n<- self$assign_value()
-                             if (axelrod_seq[n] == "D") {
-                               self$bid <- bid_vector[2]
-                             } else {
-                               self$bid <- bid_vector[1]
-                             }
-
-                           },
-
-                           check_moves <- function() {
-                            if (nrow(last_round) == 0)  {
-                             } else if (last_round[2,1] == self$opponent_id) {
-                               last_move_self <- last_round[2,5]
-                               last_move_opponent <- last_round[2,4]
-                             } else if (last_round[2,2] == self$opponent_id) {
-                               last_move_self <- last_round[2,4]
-                               last_move_opponent <- last_round[2,5]
-                              } else if (last_round[1,1] == self$opponent_id) {
-                               last_move_self <- last_round[1,5]
-                               last_move_opponent <- last_round[1,4]
-                             } else if (last_round[1,2] == self$opponent_id) {
-                               last_move_self <- last_round[1,4]
-                               last_move_opponent <- last_round[1,5]
-                             }
-                           },
-
-                           tit_for_tat <- function() {
-                            if (nrow(last_round) == 0) {
+                             if (nrow(last_round) == 0) {
                                self$bid <- bid_vector[1]
                              } else if ((nrow(last_round) == (1 | 2)) & (last_move_self == bid_vector[1]) & (last_move_opponent == bid_vector[1])) {
                                self$bid <- sample(bid_vector, 1, prob=c(4/5,1/5))
@@ -123,18 +103,15 @@ Agent <- R6Class("Agent",
                              } else if ((nrow(last_round) == (1 | 2)) & (last_move_self == bid_vector[2]) & (last_move_opponent == bid_vector[2])) {
                                self$bid <- bid_vector[2]
                              }
-                           },
 
-                           get_bid = function() {
-                             bid_vector <- c("cooperate","defect")
-                             last_move_self <- NA
-                             last_move_opponent <- NA
-                             last_round <- tail(subset(self$book, (id1 == self$id | id2 == self$id) & (id1 == self$opponent_id | id2 == self$opponent_id)), 3)
+                             axelrod_seq <- ("DDDDDDCCCDDCDDDDDDCDDDDCDCCDDCDDDDCDCCCDDCDCDCDCDDCCDDDDCDDDDDCCCDCCDD")
+                             n<- number
+                             if (axelrod_seq[n] == "D") {
+                               self$bid <- bid_vector[2]
+                             } else {
+                               self$bid <- bid_vector[1]
+                             }
 
-                             self$check_greeting()
-                             self$check_moves()
-                             self$tit_for_tat()
-                             self$string_three_plus()
                            },
 
                            formulate_bid = function() {

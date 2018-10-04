@@ -9,17 +9,17 @@ output: html_document
 
 In the agent-based tournament coding challenged each agent has to face an interated prisoner's dilemma. The prisoners dilemma is extensively studied in multiple scientific areas, such as economics, machine learning and evolutionary biology [1]. The core concept of the game is that each of the two competitors can choose 1 out of 2 options for each round. These options are to either defect or cooperate. Both player simultaneously and independently select an option and depending on both decisions a payoff for each player is determined.
 
-
-
-Payoff | Cooperate | Defect         
+Payoff | Cooperate | Defect
 --- | --- | ---
 Cooperate| 4/4 | 0/5
 Defect | 5/0 | 2/2
 
+### Authors
 
-
-
-
+Mees Hoff – 4963059
+Siemon Keij - 4285654
+Philip Seijger - 4272803
+Jason R Wang - 4788281
 
 
 ## Common Strategies
@@ -74,21 +74,24 @@ Like Naive Prober, but it tries to break the series of mutual defections after d
 
 [1]
 
-## Selected Strategie
+## Selected Strategy
 
-### Axelrod Single- Objective Evolutionary Algorithm
+### Axelrod Single-Objective Evolutionary Algorithm
 
 The concept of our agent is based on the fact that for each move in the game there are four possibilities. Both players can cooperate (CC or R for reward), the first player cooperats and the other player defects (CD or S for sucker), the first player can defect and the second cooperates (DC or T for temptation), or both players defect (DD or P for penalty). For our strategie we consider the last three moves as a three letter code. For instance, the situation is which the last three rounds both agents cooperated, has a three letter sequence RRR.
 
-This combination of letters is used to generate a number 0:63. This is done by setting R=0, T=1, S=2 and P=3 and interpret it as a number on base 4. This will result in the next formula: points round 1 * 4^2 + points round 2 *4^1 + points round 3 * 4^0. SSP for instance is 43 is this way. Each of the numbers 0:63 either stands for defect or cooperate, therefore based on the last 3 moves a option is selected. Since this decision is based upon the last the 3 moves, the first three moves cannot be defined by this strategy. For this reason these are defected.
+This combination of letters is used to generate a number 0:63. This is done by setting R=0, T=1, S=2 and P=3 and interpret it as a number on base 4. This will result in the next formula: `(points round 1) * 4^2 + (points round 2) * 4^1 + (points round 3) * 4^0`. For example, 'SSP' yields 43. Each of the numbersfrom  0:63 either stands for defect or cooperate. Therefore, based on the last 3 moves, an option is selected. Since this decision is based upon the last the 3 moves, the first three moves cannot be defined by this strategy and are run by a modified tit for tat approach.
 
 An Exception is made for the so called "lemon agents", these agents are introducing themselves by saying "Lemon!." and will always cheat. For this reason, in a situation of an opponent that introduces itself by "Lemon!." the defect option is always selected.
 
 
-The 'main.R' code is used to call two different scripts; 'raw_parser.R' en 'extract_statistics.R'. These scripts rework the data from last years tournament into a 64-bit string which can be used in the agent.
+The 'main.R' code is used to call two different scripts; 'raw_parser.R' and 'extract_statistics.R'. These scripts rework the data from last years tournament into a 64-bit string which can be used in the agent.
 
+Main.R looks as follows
 ```{R}
 ### Main File to run things in!
+#setwd(Set working directory if not yet specified)
+
 source('scripts/raw_parser.R', chdir = TRUE)
 source('scripts/extract_statistics.R', chdir = TRUE)
 
@@ -110,6 +113,22 @@ raw_parser = function(file_name) {
     tourn_raw = read.csv(file_name,sep=";",stringsAsFactors = FALSE)
     num_agents = max(unique(tourn_raw$id1)) # Only works if IDs are sequential!
     outcome_sequences = array(data=NA,dim=c(num_agents,num_agents,10000)) # 60 is wasteful. See improvement suggestion below.
+=======
+data_frame = axelrod_encode(raw_parser('data/tournament.csv'))
+
+## Run parsed array through statistics
+axelrod_string = extract_statistics(data_frame)
+View(axelrod_string)
+```
+
+'raw_parser.R' looks as follows:
+```{R}
+raw_parser = function(file_name) {
+
+    tourn_raw = read.csv(file_name,sep=",",stringsAsFactors = FALSE)
+    num_agents = max(unique(tourn_raw$id1)) # Only works if IDs are sequential!
+    outcome_sequences = array(data=NA,dim=c(num_agents,num_agents,40)) # 40 is wasteful. See improvement suggestion below.
+
     # typeof(outcome_sequences) ## just for testing
 
     ## To get data about the number of games played between each pair
@@ -165,6 +184,7 @@ axelrod_code = function(bid1, bid2) {
 }
 
 axelrod_encode = function(a_code) {
+
     # Takes a vector of behaviour and turns it into a useful data frame for data analysis
 
     num_agents = nrow(a_code) # Determine number of agents, n, in 'n x n' matrix input
@@ -183,7 +203,8 @@ axelrod_encode = function(a_code) {
                     next
                 }
 
-                encoded_seq = (a_code[i,j,k] * 4^2 + a_code[i,j,k+1] * 4^1 + a_code[i,j,k+2] * 4^0)
+                encoded_seq = (a_code[i,j,k] * 4*4 + a_code[i,j,k+1] * 4 + a_code[i,j,k+2] * 1)
+
                 code_id = c(code_id,encoded_seq)
 
                 if (a_code[i,j,k+3] > 1) { # 0 and 1 are defect; 2 and 3
@@ -255,10 +276,12 @@ extract_statistics <- function(data_frame) {
             str <- paste(str, "D",sep="")
         } else {
             str <- paste(str, " ",sep="") # For debugging
-        }
-    }
-    return(str)
+
+    return(data.frame(code_id,decision,win, stringsAsFactors = FALSE))
 }
+
+## For testing
+# raw_parser("validate.csv")
 ```
 
 The output of the scripts was the following string: CCCDCCCDCCCDCCCDCDCDCDDDCDDDDDDDCCCDCDDDCDDDDDDDDDDDCDCDCDDDDDDD. This script was used during testing, but failed to beat tit for tat and other agents consistantly. Therefore, it was decided to use a string that we got from the paper by Mittal and Deb, namely: DDDDDDCCCDDCDDDDDDCDDDDCDCCDDCDDDDCDCCCDDCDCDCDCDDCCDDDDCDDDDDCCCDCCDD. After the code, the creating and the workings of the agent will be discussed.
