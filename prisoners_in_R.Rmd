@@ -107,20 +107,6 @@ axelrod_string = extract_statistics(data_frame)
 
 The script in 'raw_parser.R' will look at the information from a file in which the bids were registered. For every possible pair of agents, the code will save the different meetings. For every pair the script will look at three meetings and save which combination this is. For every gained combination, the script will look into if the agent won or lost in the fourth meeting. It also knows what both agents bid, this can be used to state which agent won.
 
-```{R}
-raw_parser = function(file_name) {
-
-    tourn_raw = read.csv(file_name,sep=";",stringsAsFactors = FALSE)
-    num_agents = max(unique(tourn_raw$id1)) # Only works if IDs are sequential!
-    outcome_sequences = array(data=NA,dim=c(num_agents,num_agents,10000)) # 60 is wasteful. See improvement suggestion below.
-=======
-data_frame = axelrod_encode(raw_parser('data/tournament.csv'))
-
-## Run parsed array through statistics
-axelrod_string = extract_statistics(data_frame)
-View(axelrod_string)
-```
-
 'raw_parser.R' looks as follows:
 ```{R}
 raw_parser = function(file_name) {
@@ -430,6 +416,8 @@ Agent <- R6Class("Agent",
     )
 )
 ```
+
+This agent should beat tit for tat according to the paper by Mittal and Ded, however this hasn't been proven yet. It's optimised for some agents of last year, so it might be inefficient for the agent of this year.
 
 ### Comments on proces and code
 We started off on our process by reading the paper by Mittal and Deb. From this paper we got the idea to create our own 64 bit string. To make this we ran into some problems. We used the data from last year to begin with, but this didn't seem to work that well with some agents we ran together with our own agent. After tweaking our string we eventually went with the string from the paper. Our agent also has a part which is tit for tat. This is created for in the beginning, but we eventually went for defecting the first three times we meet a new agent. After these three meetings we can use the string.
