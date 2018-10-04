@@ -14,12 +14,14 @@ Payoff | Cooperate | Defect
 Cooperate| 4/4 | 0/5
 Defect | 5/0 | 2/2
 
+The full version of this work is [hosted on GitHub](https://github.com/jasonrwang/prisoners_in_R).
+
 ### Authors
 
-Mees Hoff – 4963059
-Siemon Keij - 4285654
-Philip Seijger - 4272803
-Jason R Wang - 4788281
+* Mees Hoff – 4963059
+* Siemon Keij - 4285654
+* Philip Seijger - 4272803
+* Jason R Wang - 4788281
 
 
 ## Common Strategies
