@@ -434,14 +434,14 @@ Agent <- R6Class("Agent",
 
 This agent should beat tit for tat according to the paper by Mittal and Ded, however this hasn't been proven yet. It's optimised for some agents of last year, so it might be inefficient for the agent of this year.
 
-### Comments on proces and code
+### Comments on process and code
 We started off on our process by reading the paper by Mittal and Deb. From this paper we got the idea to create our own 64 bit string. To make this we ran into some problems. We used the data from last year to begin with, but this didn't seem to work that well with some agents we ran together with our own agent. After tweaking our string we eventually went with the string from the paper. Our agent also has a part which is tit for tat. This is created for in the beginning, but we eventually went for defecting the first three times we meet a new agent. After these three meetings we can use the string.
 
 Furthermore, we also have a part of the code which checks what the greeting is of the agent. This is because of the greeting for the all defect agents, they say "Lemon!.". Unfortunately this part of the code wasn't working to during our testing fase. therefore we were forced to exclude this from our delivered code.
 
 Our first agent had different functions which were called by the get_bid function, but the provided tournament code did not work with this agent. Therefore we were forced to put all the functions in one large function. With further testing we discovered that other parts of the code that worked separately, didn't work with the provided tournament code. This let us to change our code even more.
 
-
+## References
 [1] S. Mittal and K. Deb, “Optimal Strategies of the Iterated Prisoner’s Dilemma Problem for Multiple Conflicting Objectives,” IEEE Trans. Evol. Comput., vol. 13, no. 3, pp. 554–565, Jun. 2009.
 
 [2] R. Axelrod, “The evolution of strategies in the iterated prisoner’s dilemma,” in Genetic Algorithms and Simulated Annealing, L. Davis, Ed. Los Altos, CA: Morgan Kaufmann, 1987.
