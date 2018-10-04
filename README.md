@@ -8,6 +8,15 @@ This project is for an algorithm to play in the TU Delft EPA1315 Prisoner's Dile
 
 This agent does not evolve during a game – it must be trained beforehand on some set of data. In this case, `tournament.csv` is from the EPA1315 Fall 2017 tournament. Since this agent uses Axelrod's method, the first three encounters will be played with a cooperate and then modified Tit-for-tat methodology. Only the `n > 3` encounter will actually implement Axelrod's method.
 
+See prisoners_in_R.Rmd for more detailed documentation.
+
+### Usage
+
+1. Run main.py and copy the output string
+2. Put the output string into `Agent_BRUTE_MELLOW.R`, which is the final agent we submitted.
+3. Set your working directory to `Example_Tournament`
+4. Run the example tournament `*.Rmd` file and see your results!
+
 ## Acknowledgements
 
 This project was made by Siemon Keij, Phillip Seijger, Mees Hoff, and Jason R Wang.
