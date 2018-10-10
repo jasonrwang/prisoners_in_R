@@ -9,3 +9,6 @@ data_frame = axelrod_encode(raw_parser('Example_Tournament/bid_register.csv'))
 axelrod_string = extract_statistics(data_frame)
 
 # The string above can be put into the agent manually now
+
+
+#test change
